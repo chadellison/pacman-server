@@ -1,9 +1,9 @@
 class GameEventBroadcastJob < ApplicationJob
   queue_as :default
 
-  def perform(gameEvent)
+  def perform(gameData)
     ActionCable
       .server
-      .broadcast("game_data", {gameData: 'here is data from the server'}.to_json)
+      .broadcast("game_data", {gameData: gameData})
   end
 end

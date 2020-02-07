@@ -14,6 +14,6 @@ class GameDataChannel < ApplicationCable::Channel
     # update game data
     # write to redis
     # and then broadcast
-    GameEventBroadcastJob.perform_later('the current state of the game')
+    GameEventBroadcastJob.perform_later(game_event)
   end
 end
