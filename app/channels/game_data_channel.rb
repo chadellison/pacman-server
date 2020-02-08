@@ -9,7 +9,7 @@ class GameDataChannel < ApplicationCable::Channel
   end
 
   def create(opts)
-    game_event_data = opts.fetch('gameEventData')
-    GameData.handleEvent(game_event_data)
+    game_data = opts.fetch('gameData')
+    GameEvent.handleEvent(game_data)
   end
 end
