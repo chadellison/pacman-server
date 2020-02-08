@@ -9,11 +9,7 @@ class GameDataChannel < ApplicationCable::Channel
   end
 
   def create(opts)
-    game_event = opts.fetch('gameEvent')
-    # pull game out of redis
-    # update game data
-    # write to redis
-    # and then broadcast
-    GameEventBroadcastJob.perform_later(game_event)
+    game_event_data = opts.fetch('gameEventData')
+    GameData.handleEvent(game_event_data)
   end
 end
