@@ -14,7 +14,7 @@ class Player
   end
 
   def self.get_players_with_updated_timestamps
-    time_stamp = Time.now
+    time_stamp = Time.now.to_f
     game = JSON.parse(REDIS.get('game'))
     get_players.map do |player|
       player['location'] = calculateLocation(player, game['board'])
@@ -24,8 +24,8 @@ class Player
   end
 
   def self.calculateLocation(player, board)
-    difference_in_milliseconds = (Time.now - Time.new(player['updated_at'])) * 1000 / ANIMATION_FRAME_RATE
-    distance = (player['velocity'] * difference_in_milliseconds).round
+    elapsed_time = (Time.now.to_f - player['updated_at']) * 1000 / ANIMATION_FRAME_RATE
+    distance = (player['velocity'] * elapsed_time).round
     case player['direction']
     when 'up'
       y = distance <= PLAYER_RADIUS ? PLAYER_RADIUS : distance
@@ -47,16 +47,20 @@ class Player
   def self.create_player(game_data)
     player = {
       'id' => game_data['id'],
+      'name' => Faker::Name.name,
+      'score' => 0,
       'location' => START_COORDINATES,
       'direction' => 'right',
-      'updated_at' => Time.now.to_s,
       'velocity' => VELOCITY,
       'radius' => PLAYER_RADIUS
     }
   end
 
-  def self.updated_players_for_start_event(players, game_data)
-    time_stamp = Time.now
+  def self.updated_players_for_start_event(game_data)
+    player = create_player(game_data)
+    players = get_players << player
+
+    time_stamp = Time.now.to_f
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
         player['location'] = player['location']
@@ -71,7 +75,7 @@ class Player
   end
 
   def self.updated_players_for_move_event(game_data)
-    time_stamp = Time.now
+    time_stamp = Time.now.to_f
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']

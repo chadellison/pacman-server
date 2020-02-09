@@ -11,6 +11,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'rack-cors'
 gem 'listen'
 gem 'redis'
+gem 'faker'
 
 group :development, :test do
   gem 'rspec-rails'

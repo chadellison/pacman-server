@@ -5,9 +5,7 @@ class GameEvent
   end
 
   def self.handleStartEvent(game_data)
-    player = Player.create_player(game_data)
-    players = Player.get_players << player
-    updated_players = Player.updated_players_for_start_event(players, game_data)
+    updated_players = Player.updated_players_for_start_event(game_data)
     GameEventBroadcastJob.perform_later(updated_players)
   end
 
