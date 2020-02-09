@@ -1,4 +1,9 @@
 class Player
+  START_COORDINATES = {'x' => 35, 'y' => 35}
+  VELOCITY = 5
+  ANIMATION_FRAME_RATE = 30.0
+  PLAYER_RADIUS = 25
+
   def self.get_players
     json_players = REDIS.get('players')
     if json_players.present?
@@ -10,38 +15,72 @@ class Player
 
   def self.get_players_with_updated_timestamps
     time_stamp = Time.now
+    game = JSON.parse(REDIS.get('game'))
     get_players.map do |player|
-      player['location'] = calculateLocation(player)
+      player['location'] = calculateLocation(player, game['board'])
       player['updated_at'] = time_stamp
       player
     end
   end
 
-  def self.calculateLocation(player)
-    difference_in_milliseconds = (Time.now - Time.new(player['updated_at'])) * 1000 / 30.0
-    distance = (5 * difference_in_milliseconds).round
+  def self.calculateLocation(player, board)
+    difference_in_milliseconds = (Time.now - Time.new(player['updated_at'])) * 1000 / ANIMATION_FRAME_RATE
+    distance = (player['velocity'] * difference_in_milliseconds).round
     case player['direction']
     when 'up'
-      y = distance <= 25 ? 25 : distance
-      location = {x: player['location']['x'], y: y }
+      y = distance <= PLAYER_RADIUS ? PLAYER_RADIUS : distance
+      location = {'x' => player['location']['x'], 'y' => y }
     when 'left'
-      x = distance <= 25 ? 25 : distance
-      location = {x: x, y: player['location']['y']}
+      x = distance <= PLAYER_RADIUS ? PLAYER_RADIUS : distance
+      location = {'x' => x, 'y' => player['location']['y']}
     when 'right'
-      x = distance >= 980 - 25 ? 980 - 25 : distance
-      location = {x: x, y: player['location']['y']}
+      width_minus_radius = board['width'] - PLAYER_RADIUS
+      x = distance >= width_minus_radius ? width_minus_radius : distance
+      location = {'x' => x, 'y' => player['location']['y']}
     when 'down'
-      y = distance >= 665 - 25 ? 665 - 25 : distance
-      location = {x: player['location']['x'], y: y}
+      height_minus_radius = board['height'] - PLAYER_RADIUS
+      y = distance >= height_minus_radius ? height_minus_radius : distance
+      location = {'x' => player['location']['x'], 'y' => y}
     end
   end
 
   def self.create_player(game_data)
     player = {
       'id' => game_data['id'],
-      'location' => {x: 35, y: 35},
+      'location' => START_COORDINATES,
       'direction' => 'right',
-      'updated_at' => Time.now.to_s
+      'updated_at' => Time.now.to_s,
+      'velocity' => VELOCITY,
+      'radius' => PLAYER_RADIUS
     }
+  end
+
+  def self.updated_players_for_start_event(players, game_data)
+    time_stamp = Time.now
+    updated_players = players.map do |player|
+      if player['id'] == game_data['id']
+        player['location'] = player['location']
+      else
+        player['location'] = game_data['playerLocations'][player['id'].to_s]
+      end
+      player['updated_at'] = time_stamp
+      player
+    end
+    REDIS.set('players', updated_players.to_json)
+    updated_players
+  end
+
+  def self.updated_players_for_move_event(game_data)
+    time_stamp = Time.now
+    updated_players = Player.get_players.map do |player|
+      if player['id'] == game_data['id']
+        player['direction'] = game_data['gameEvent']
+      end
+      player['location'] = game_data['playerLocations'][player['id'].to_s]
+      player['updated_at'] = time_stamp
+      player
+    end
+    REDIS.set('players', updated_players.to_json)
+    updated_players
   end
 end
