@@ -6,7 +6,7 @@ class Player
   MOUTH_OPEN_VALUE = 40
   MOUTH_POSITION = 40
 
-  def self.calculateLocation(player, board)
+  def self.calculate_location(player, board)
     elapsed_time = (Time.now.to_f - player['updated_at']) * 1000 / ANIMATION_FRAME_RATE
     distance = (player['velocity'] * elapsed_time).round
     case player['direction']
@@ -54,7 +54,7 @@ class Player
     time_stamp = Time.now.to_f
     game = JSON.parse(REDIS.get('game'))
     get_players.map do |player|
-      player['location'] = calculateLocation(player, game['board'])
+      player['location'] = calculate_location(player, game['board'])
       player['updated_at'] = time_stamp
       player
     end
@@ -84,12 +84,34 @@ class Player
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
       end
-      player['location'] = game_data['playerLocations'][player['id'].to_s]
+      player['location'] = handle_location(
+        player,
+        game_data['playerLocations'][player['id'].to_s],
+        time_stamp,
+        game_data['sentTime']
+      )
       player['updated_at'] = time_stamp
       player
     end
     REDIS.set('players', updated_players.to_json)
     updated_players
+  end
+
+  def self.handle_location(player, new_location, current_timestamp, sent_time_stamp)
+    latency_offset = (current_timestamp - (sent_time_stamp / 1000.0)) * 2
+    elapsed_time = latency_offset * 1000 / ANIMATION_FRAME_RATE
+    distance = (elapsed_time * player['velocity']).round
+
+    case player['direction']
+    when 'up'
+      {'x' => new_location['x'], 'y' => new_location['y'] - distance}
+    when 'left'
+      {'x' => new_location['x'] - distance, 'y' => new_location['y']}
+    when 'right'
+      {'x' => new_location['x'] + distance, 'y' => new_location['y']}
+    when 'down'
+      {'x' => new_location['x'], 'y' => new_location['y'] + distance}
+    end
   end
 
   def self.remove_player(userId)
