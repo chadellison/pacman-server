@@ -3,6 +3,8 @@ class Player
   VELOCITY = 5
   ANIMATION_FRAME_RATE = 30.0
   PLAYER_RADIUS = 25
+  MOUTH_OPEN_VALUE = 40
+  MOUTH_POSITION = 40
 
   def self.calculateLocation(player, board)
     elapsed_time = (Time.now.to_f - player['updated_at']) * 1000 / ANIMATION_FRAME_RATE
@@ -33,7 +35,9 @@ class Player
       'location' => START_COORDINATES,
       'direction' => 'right',
       'velocity' => VELOCITY,
-      'radius' => PLAYER_RADIUS
+      'radius' => PLAYER_RADIUS,
+      'mouthOpenValue' => MOUTH_OPEN_VALUE,
+      'mouthPosition' => MOUTH_POSITION
     }
   end
 
