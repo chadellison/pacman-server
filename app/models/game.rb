@@ -15,12 +15,12 @@ class Game
     REDIS.set('game', game.to_json)
   end
 
-  def self.get_game
+  def self.get_game(sent_time)
     json_game = REDIS.get('game')
 
     if json_game.present?
       game = JSON.parse(json_game)
-      players = Player.get_players_with_updated_timestamps
+      players = Player.get_players_with_updated_timestamps(sent_time)
     else
       game = create_game
       players = []

@@ -6,27 +6,6 @@ class Player
   MOUTH_OPEN_VALUE = 40
   MOUTH_POSITION = 40
 
-  def self.calculate_location(player, board)
-    elapsed_time = (Time.now.to_f - player['updated_at']) * 1000 / ANIMATION_FRAME_RATE
-    distance = (player['velocity'] * elapsed_time).round
-    case player['direction']
-    when 'up'
-      y = distance <= PLAYER_RADIUS ? PLAYER_RADIUS : distance
-      location = {'x' => player['location']['x'], 'y' => y }
-    when 'left'
-      x = distance <= PLAYER_RADIUS ? PLAYER_RADIUS : distance
-      location = {'x' => x, 'y' => player['location']['y']}
-    when 'right'
-      width_minus_radius = board['width'] - PLAYER_RADIUS
-      x = distance >= width_minus_radius ? width_minus_radius : distance
-      location = {'x' => x, 'y' => player['location']['y']}
-    when 'down'
-      height_minus_radius = board['height'] - PLAYER_RADIUS
-      y = distance >= height_minus_radius ? height_minus_radius : distance
-      location = {'x' => player['location']['x'], 'y' => y}
-    end
-  end
-
   def self.create_player(game_data)
     player = {
       'id' => game_data['id'],
@@ -51,19 +30,35 @@ class Player
     end
   end
 
-  def self.get_players_with_updated_timestamps
+  def self.get_players_with_updated_timestamps(sent_time)
     time_stamp = Time.now.to_f
-    game = JSON.parse(REDIS.get('game'))
+    board = JSON.parse(REDIS.get('game'))['board']
+
+    latency_offset = find_latency_offset(time_stamp, sent_time)
     get_players.map do |player|
-      player['location'] = calculate_location(player, game['board'])
+      elapsed_time = (time_stamp - player['updated_at']) + latency_offset
+
+      distance = calculate_distance(elapsed_time, player['velocity'])
+      player['location'] = handle_location(
+        player['direction'],
+        player['location'],
+        distance,
+        board['width'],
+        board['height']
+      )
       player['updated_at'] = time_stamp
       player
     end
   end
 
+  def self.find_latency_offset(current_timestamp, sent_time)
+    current_timestamp - (sent_time.to_f / 1000.0)
+  end
+
   def self.updated_players_for_start_event(game_data)
     player = create_player(game_data)
     players = get_players << player
+    board = JSON.parse(REDIS.get('game'))['board']
 
     time_stamp = Time.now.to_f
     updated_players = players.map do |player|
@@ -72,7 +67,7 @@ class Player
       else
         start_location = game_data['playerLocations'][player['id'].to_s]
       end
-      player['location'] = handle_location(player, start_location)
+      update_player(player, board, time_stamp, start_location)
       player['updated_at'] = time_stamp
       player
     end
@@ -80,42 +75,72 @@ class Player
     updated_players
   end
 
-  def self.find_latency_offset(current_timestamp, sent_time)
-    current_timestamp - (sent_time / 1000.0)
-  end
-
   def self.updated_players_for_move_event(game_data)
+    board = JSON.parse(REDIS.get('game'))['board']
     time_stamp = Time.now.to_f
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
         player['latencyOffset'] = find_latency_offset(time_stamp, game_data['sentTime'])
       end
-      player['location'] = handle_location(
-        player,
-        game_data['playerLocations'][player['id'].to_s]
-      )
-      player['updated_at'] = time_stamp
-      player
+      location = game_data['playerLocations'][player['id'].to_s]
+      update_player(player, board, time_stamp, location)
     end
     REDIS.set('players', updated_players.to_json)
     updated_players
   end
 
-  def self.handle_location(player, new_location)
-    elapsed_time = player['latencyOffset'] * 2 * 1000 / ANIMATION_FRAME_RATE
-    distance = (elapsed_time * player['velocity']).round
+  def self.update_player(player, board, time_stamp, location)
+    distance = calculate_distance(player['latencyOffset'] * 2, player['velocity'])
+    player['location'] = handle_location(
+      player['direction'],
+      location,
+      distance,
+      board['width'],
+      board['height']
+    )
+    player['updated_at'] = time_stamp
+    player
+  end
 
-    case player['direction']
-    when 'up'
-      {'x' => new_location['x'], 'y' => new_location['y'] - distance}
-    when 'left'
-      {'x' => new_location['x'] - distance, 'y' => new_location['y']}
-    when 'right'
-      {'x' => new_location['x'] + distance, 'y' => new_location['y']}
-    when 'down'
-      {'x' => new_location['x'], 'y' => new_location['y'] + distance}
+  def self.calculate_distance(difference_in_milliseconds, velocity)
+    elapsed_time = difference_in_milliseconds * 1000 / ANIMATION_FRAME_RATE
+    (velocity * elapsed_time).round
+  end
+
+  def self.handle_location(direction, location, distance, board_width, board_height)
+    case direction
+    when 'up' then handle_up(location, distance)
+    when 'left' then handle_left(location, distance)
+    when 'right' then handle_right(location, distance, board_width)
+    when 'down' then handle_down(location, distance, board_height)
     end
+  end
+
+  def self.handle_up(location, distance)
+    new_location = location['y'] - distance
+    y = new_location <= PLAYER_RADIUS ? PLAYER_RADIUS : new_location
+    {'x' => location['x'], 'y' => y }
+  end
+
+  def self.handle_left(location, distance)
+    new_location = location['x'] - distance
+    x = new_location <= PLAYER_RADIUS ? PLAYER_RADIUS : new_location
+    {'x' => x, 'y' => location['y']}
+  end
+
+  def self.handle_right(location, distance, board_width)
+    new_location = location['x'] + distance
+    width_minus_radius = board_width - PLAYER_RADIUS
+    x = new_location >= width_minus_radius ? width_minus_radius : new_location
+    {'x' => x, 'y' => location['y']}
+  end
+
+  def self.handle_down(location, distance, board_height)
+    new_location = location['y'] + distance
+    height_minus_radius = board_height - PLAYER_RADIUS
+    y = new_location >= height_minus_radius ? height_minus_radius : new_location
+    {'x' => location['x'], 'y' => y}
   end
 
   def self.remove_player(userId)
