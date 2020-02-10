@@ -4,25 +4,6 @@ class Player
   ANIMATION_FRAME_RATE = 30.0
   PLAYER_RADIUS = 25
 
-  def self.get_players
-    json_players = REDIS.get('players')
-    if json_players.present?
-      JSON.parse(json_players)
-    else
-      []
-    end
-  end
-
-  def self.get_players_with_updated_timestamps
-    time_stamp = Time.now.to_f
-    game = JSON.parse(REDIS.get('game'))
-    get_players.map do |player|
-      player['location'] = calculateLocation(player, game['board'])
-      player['updated_at'] = time_stamp
-      player
-    end
-  end
-
   def self.calculateLocation(player, board)
     elapsed_time = (Time.now.to_f - player['updated_at']) * 1000 / ANIMATION_FRAME_RATE
     distance = (player['velocity'] * elapsed_time).round
@@ -56,6 +37,25 @@ class Player
     }
   end
 
+  def self.get_players
+    json_players = REDIS.get('players')
+    if json_players.present?
+      JSON.parse(json_players)
+    else
+      []
+    end
+  end
+
+  def self.get_players_with_updated_timestamps
+    time_stamp = Time.now.to_f
+    game = JSON.parse(REDIS.get('game'))
+    get_players.map do |player|
+      player['location'] = calculateLocation(player, game['board'])
+      player['updated_at'] = time_stamp
+      player
+    end
+  end
+
   def self.updated_players_for_start_event(game_data)
     player = create_player(game_data)
     players = get_players << player
@@ -86,5 +86,10 @@ class Player
     end
     REDIS.set('players', updated_players.to_json)
     updated_players
+  end
+
+  def self.remove_player(userId)
+    updated_players = get_players.reject { |player| player['id'] == userId }
+    REDIS.set('players', updated_players.to_json)
   end
 end
