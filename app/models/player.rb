@@ -37,7 +37,8 @@ class Player
       'velocity' => VELOCITY,
       'radius' => PLAYER_RADIUS,
       'mouthOpenValue' => MOUTH_OPEN_VALUE,
-      'mouthPosition' => MOUTH_POSITION
+      'mouthPosition' => MOUTH_POSITION,
+      'latencyOffset' => find_latency_offset(Time.now.to_f, game_data['sentTime'])
     }
   end
 
@@ -67,10 +68,11 @@ class Player
     time_stamp = Time.now.to_f
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
-        player['location'] = player['location']
+        start_location = player['location']
       else
-        player['location'] = game_data['playerLocations'][player['id'].to_s]
+        start_location = game_data['playerLocations'][player['id'].to_s]
       end
+      player['location'] = handle_location(player, start_location)
       player['updated_at'] = time_stamp
       player
     end
@@ -78,17 +80,20 @@ class Player
     updated_players
   end
 
+  def self.find_latency_offset(current_timestamp, sent_time)
+    current_timestamp - (sent_time / 1000.0)
+  end
+
   def self.updated_players_for_move_event(game_data)
     time_stamp = Time.now.to_f
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
+        player['latencyOffset'] = find_latency_offset(time_stamp, game_data['sentTime'])
       end
       player['location'] = handle_location(
         player,
-        game_data['playerLocations'][player['id'].to_s],
-        time_stamp,
-        game_data['sentTime']
+        game_data['playerLocations'][player['id'].to_s]
       )
       player['updated_at'] = time_stamp
       player
@@ -97,9 +102,8 @@ class Player
     updated_players
   end
 
-  def self.handle_location(player, new_location, current_timestamp, sent_time_stamp)
-    latency_offset = (current_timestamp - (sent_time_stamp / 1000.0)) * 2
-    elapsed_time = latency_offset * 1000 / ANIMATION_FRAME_RATE
+  def self.handle_location(player, new_location)
+    elapsed_time = player['latencyOffset'] * 2 * 1000 / ANIMATION_FRAME_RATE
     distance = (elapsed_time * player['velocity']).round
 
     case player['direction']
