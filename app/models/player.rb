@@ -17,7 +17,7 @@ class Player
       'radius' => PLAYER_RADIUS,
       'mouthOpenValue' => MOUTH_OPEN_VALUE,
       'mouthPosition' => MOUTH_POSITION,
-      'latencyOffset' => find_latency_offset(Time.now.to_f, game_data['sentTime'])
+      'latencyOffset' => find_latency_offset(Time.now.utc.to_f, game_data['sentTime'])
     }
   end
 
@@ -31,7 +31,7 @@ class Player
   end
 
   def self.get_players_with_updated_timestamps(sent_time)
-    time_stamp = Time.now.to_f
+    time_stamp = Time.now.utc.to_f
     board = JSON.parse(REDIS.get('game'))['board']
 
     latency_offset = find_latency_offset(time_stamp, sent_time)
@@ -60,7 +60,7 @@ class Player
     players = get_players << player
     board = JSON.parse(REDIS.get('game'))['board']
 
-    time_stamp = Time.now.to_f
+    time_stamp = Time.now.utc.to_f
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
         start_location = player['location']
@@ -77,7 +77,7 @@ class Player
 
   def self.updated_players_for_move_event(game_data)
     board = JSON.parse(REDIS.get('game'))['board']
-    time_stamp = Time.now.to_f
+    time_stamp = Time.now.utc.to_f
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
