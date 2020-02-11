@@ -51,6 +51,7 @@ class Player
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
         start_location = player['location']
+        player['latency'] = game_data['latency']
       else
         start_location = game_data['playerLocations'][player['id'].to_s]
       end
@@ -67,6 +68,7 @@ class Player
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
+        player['latency'] = game_data['latency']
       end
       location = game_data['playerLocations'][player['id'].to_s]
       distance = calculate_distance(player['latency'], player['velocity'])
@@ -89,8 +91,8 @@ class Player
   end
 
   def self.calculate_distance(latency, velocity)
-    elapsed_time = latency / ANIMATION_FRAME_RATE
-    (velocity * elapsed_time).round
+    game_time = latency / ANIMATION_FRAME_RATE
+    (velocity * game_time).round
   end
 
   def self.handle_location(direction, location, distance, board_width, board_height)
