@@ -17,7 +17,7 @@ class Player
       'radius' => PLAYER_RADIUS,
       'mouthOpenValue' => MOUTH_OPEN_VALUE,
       'mouthPosition' => MOUTH_POSITION,
-      'latencyOffset' => find_latency_offset(Time.now.utc.to_f, game_data['sentTime'])
+      'latency' => game_data['latency']
     }
   end
 
@@ -34,25 +34,12 @@ class Player
     time_stamp = Time.now.utc.to_f
     board = JSON.parse(REDIS.get('game'))['board']
 
-    latency_offset = find_latency_offset(time_stamp, sent_time)
+    latency_offset = (time_stamp - (sent_time.to_f / 1000.0) * 2)
     get_players.map do |player|
       elapsed_time = (time_stamp - player['updated_at']) + latency_offset
-
       distance = calculate_distance(elapsed_time, player['velocity'])
-      player['location'] = handle_location(
-        player['direction'],
-        player['location'],
-        distance,
-        board['width'],
-        board['height']
-      )
-      player['updated_at'] = time_stamp
-      player
+      update_player(player, board, time_stamp, player['location'], distance)
     end
-  end
-
-  def self.find_latency_offset(current_timestamp, sent_time)
-    current_timestamp - (sent_time.to_f / 1000.0)
   end
 
   def self.updated_players_for_start_event(game_data)
@@ -67,9 +54,8 @@ class Player
       else
         start_location = game_data['playerLocations'][player['id'].to_s]
       end
-      update_player(player, board, time_stamp, start_location)
-      player['updated_at'] = time_stamp
-      player
+      distance = calculate_distance(player['latency'], player['velocity'])
+      update_player(player, board, time_stamp, start_location, distance)
     end
     REDIS.set('players', updated_players.to_json)
     updated_players
@@ -81,17 +67,16 @@ class Player
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
-        player['latencyOffset'] = find_latency_offset(time_stamp, game_data['sentTime'])
       end
       location = game_data['playerLocations'][player['id'].to_s]
-      update_player(player, board, time_stamp, location)
+      distance = calculate_distance(player['latency'], player['velocity'])
+      update_player(player, board, time_stamp, location, distance)
     end
     REDIS.set('players', updated_players.to_json)
     updated_players
   end
 
-  def self.update_player(player, board, time_stamp, location)
-    distance = calculate_distance(player['latencyOffset'] * 2, player['velocity'])
+  def self.update_player(player, board, time_stamp, location, distance)
     player['location'] = handle_location(
       player['direction'],
       location,
@@ -103,8 +88,8 @@ class Player
     player
   end
 
-  def self.calculate_distance(difference_in_milliseconds, velocity)
-    elapsed_time = difference_in_milliseconds * 1000 / ANIMATION_FRAME_RATE
+  def self.calculate_distance(latency, velocity)
+    elapsed_time = latency / ANIMATION_FRAME_RATE
     (velocity * elapsed_time).round
   end
 
