@@ -34,7 +34,7 @@ class Player
     time_stamp = Time.now.utc.to_f
     board = JSON.parse(REDIS.get('game'))['board']
 
-    latency_offset = (time_stamp - (sent_time.to_f / 1000.0) * 2)
+    latency_offset = (time_stamp - (sent_time.to_f / 1000.0)) * 2
     get_players.map do |player|
       elapsed_time = (time_stamp - player['updated_at']) + latency_offset
       distance = calculate_distance(elapsed_time, player['velocity'])
@@ -91,7 +91,7 @@ class Player
   end
 
   def self.calculate_distance(latency, velocity)
-    game_time = latency / ANIMATION_FRAME_RATE
+    game_time = latency / 1000 / ANIMATION_FRAME_RATE
     (velocity * game_time).round
   end
 
