@@ -34,11 +34,12 @@ class Player
     players = get_players << player
 
     updated_player = nil
+    time_stamp = Time.now.to_f * 1000
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = 'right'
         player['lastEvent'] = game_data['gameEvent']
-        player['updatedAt'] = Time.now.to_f * 1000
+        player['updatedAt'] = time_stamp
         updated_player = player
       end
       player
@@ -49,12 +50,13 @@ class Player
 
   def self.updated_player_for_move_event(game_data)
     updated_player = nil
+    time_stamp = Time.now.to_f * 1000
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
         player['lastEvent'] = game_data['gameEvent']
         player['location'] = game_data['location']
-        player['updatedAt'] = Time.now.to_f * 1000
+        player['updatedAt'] = time_stamp
         updated_player = player
       end
       player
