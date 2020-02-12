@@ -55,6 +55,7 @@ class Player
       else
         start_location = game_data['playerLocations'][player['id'].to_s]
       end
+      distance = calculate_distance(latency + player['latency'], player['velocity'])
       update_player(player, board, current_time, start_location, player['latency'] + latency)
     end
     REDIS.set('players', updated_players.to_json)
@@ -66,13 +67,15 @@ class Player
 
     current_time = Time.now.to_f * 1000
     latency = current_time - game_data['sentTime']
+
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['direction'] = game_data['gameEvent']
         player['latency'] = latency
       end
+      distance = calculate_distance(latency + player['latency'], player['velocity'])
       location = game_data['playerLocations'][player['id'].to_s]
-      update_player(player, board, current_time, location, player['latency'] + latency)
+      update_player(player, board, current_time, location, distance)
     end
     REDIS.set('players', updated_players.to_json)
     updated_players
