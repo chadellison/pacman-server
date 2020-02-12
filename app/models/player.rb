@@ -31,7 +31,7 @@ class Player
 
   def self.get_players_with_updated_timestamps(sent_time)
     time_stamp = Time.now.to_f * 1000
-    latency_offset = (time_stamp - sent_time) * 2
+    latency_offset = (time_stamp - sent_time.to_f) * 2
     board = JSON.parse(REDIS.get('game'))['board']
 
     get_players.map do |player|
