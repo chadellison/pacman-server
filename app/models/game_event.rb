@@ -5,12 +5,12 @@ class GameEvent
   end
 
   def self.handleStartEvent(game_data)
-    updated_players = Player.updated_players_for_start_event(game_data)
-    GameEventBroadcastJob.perform_later(updated_players)
+    updated_player = Player.updated_player_for_start_event(game_data)
+    GameEventBroadcastJob.perform_later(updated_player)
   end
 
   def self.handleMoveEvent(game_data)
-    updatedPlayers = Player.updated_players_for_move_event(game_data)
-    GameEventBroadcastJob.perform_later(updatedPlayers)
+    updatedPlayer = Player.updated_player_for_move_event(game_data)
+    GameEventBroadcastJob.perform_later(updatedPlayer)
   end
 end
