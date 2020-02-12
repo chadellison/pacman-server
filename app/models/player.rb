@@ -94,7 +94,7 @@ class Player
   end
 
   def self.calculate_distance(elapsed_time, velocity)
-    game_time = elapsed_time / 10.0 / ANIMATION_FRAME_RATE
+    game_time = elapsed_time / 5 / ANIMATION_FRAME_RATE
     (velocity * game_time).round
   end
 
