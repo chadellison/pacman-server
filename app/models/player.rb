@@ -29,7 +29,7 @@ class Player
     end
   end
 
-  def self.updated_player_for_start_event(game_data)
+  def self.add_player(game_data)
     player = create_player(game_data)
     players = get_players << player
 
@@ -48,7 +48,6 @@ class Player
   end
 
   def self.updated_player_for_move_event(game_data)
-    current_time = Time.now.to_f * 1000
     updated_player = nil
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
@@ -67,5 +66,6 @@ class Player
   def self.remove_player(userId)
     updated_players = get_players.reject { |player| player['id'] == userId }
     REDIS.set('players', updated_players.to_json)
+    {id: userId, lastEvent: 'remove'}
   end
 end
