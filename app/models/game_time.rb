@@ -1,7 +1,8 @@
 class GameTime
-  def self.get_time_data(sent_time)
-    server_time = Time.now.to_f * 1000
-    difference = server_time - sent_time
-    {serverTime: server_time, difference: difference}
+  def self.get_time_data(time_params)
+    client_difference = time_params[:sent_time].to_f - Time.at(time_params[:start_time].to_f / 1000).to_f
+    server_difference = (Time.now.to_f * 1000) - Time.at(time_params[:start_time].to_f / 1000).to_f
+    difference = client_difference - server_difference
+    {difference: difference}
   end
 end
