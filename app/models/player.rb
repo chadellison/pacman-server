@@ -1,10 +1,7 @@
 class Player
-  START_COORDINATES = {'x' => 35, 'y' => 35}
+  START_COORDINATES = {'x' => 60, 'y' => 60}
   VELOCITY = 5
   ANIMATION_FRAME_RATE = 30.0
-  PLAYER_RADIUS = 25
-  MOUTH_OPEN_VALUE = 40
-  MOUTH_POSITION = 40
 
   def self.create_player(game_data)
     player = {
@@ -12,11 +9,9 @@ class Player
       'name' => Faker::Name.name,
       'score' => 0,
       'location' => START_COORDINATES,
-      'direction' => 'right',
+      'direction' => '',
       'velocity' => VELOCITY,
-      'radius' => PLAYER_RADIUS,
-      'mouthOpenValue' => MOUTH_OPEN_VALUE,
-      'mouthPosition' => MOUTH_POSITION
+      'rotation' => 0
     }
   end
 
@@ -37,7 +32,7 @@ class Player
     time_stamp = (Time.now.to_f * 1000).round
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
-        player['direction'] = 'right'
+        player['direction'] = ''
         player['lastEvent'] = game_data['gameEvent']
         player['updatedAt'] = time_stamp
         updated_player = player
@@ -56,6 +51,7 @@ class Player
         player['direction'] = game_data['gameEvent']
         player['lastEvent'] = game_data['gameEvent']
         player['location'] = game_data['location']
+        player['rotation'] = game_data['rotation']
         player['updatedAt'] = time_stamp
         updated_player = player
       end
