@@ -10,7 +10,7 @@ class Player
       'score' => 0,
       'location' => START_COORDINATES,
       'velocity' => VELOCITY,
-      'angle' => 0
+      'angle' => 180
     }
   end
 
