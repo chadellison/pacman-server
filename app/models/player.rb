@@ -9,9 +9,8 @@ class Player
       'name' => Faker::Name.name,
       'score' => 0,
       'location' => START_COORDINATES,
-      'direction' => '',
       'velocity' => VELOCITY,
-      'rotation' => 0
+      'angle' => 0
     }
   end
 
@@ -32,7 +31,6 @@ class Player
     time_stamp = (Time.now.to_f * 1000).round
     updated_players = players.map do |player|
       if player['id'] == game_data['id']
-        player['direction'] = ''
         player['lastEvent'] = game_data['gameEvent']
         player['updatedAt'] = time_stamp
         updated_player = player
@@ -48,10 +46,9 @@ class Player
     time_stamp = (Time.now.to_f * 1000).round
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
-        player['direction'] = game_data['gameEvent']
         player['lastEvent'] = game_data['gameEvent']
         player['location'] = game_data['location']
-        player['rotation'] = game_data['rotation']
+        player['angle'] = game_data['angle']
         player['updatedAt'] = time_stamp
         updated_player = player
       end
