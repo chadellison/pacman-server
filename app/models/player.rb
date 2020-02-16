@@ -10,7 +10,8 @@ class Player
       'score' => 0,
       'location' => START_COORDINATES,
       'velocity' => VELOCITY,
-      'angle' => 0
+      'angle' => 0,
+      'isAccelerating' => false
     }
   end
 
@@ -50,6 +51,7 @@ class Player
         player['location'] = game_data['location']
         player['angle'] = game_data['angle']
         player['updatedAt'] = time_stamp
+        player['isAccelerating'] = true if game_data['gameEvent'] == 'up'
         updated_player = player
       end
       player
