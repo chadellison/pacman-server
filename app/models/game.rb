@@ -8,8 +8,7 @@ class Game
     game = {
       board: {
         width: DEFAULT_BOARD_WITH,
-        height: DEFAULT_BOARD_HEIGHT,
-        squares: default_squares
+        height: DEFAULT_BOARD_HEIGHT
       }
     }
     REDIS.set('game', game.to_json)
@@ -26,21 +25,5 @@ class Game
       players = []
     end
     { game: game, players: players }
-  end
-
-  def self.default_squares
-    x = SQUARE_DISTANCE
-    y = SQUARE_DISTANCE
-    squares = {}
-    while y <= DEFAULT_BOARD_HEIGHT do
-      while x <= DEFAULT_BOARD_WITH do
-        squares[x.to_s + ':' + y.to_s] = 1
-        x += SQUARE_DISTANCE
-      end
-      squares[x.to_s + ':' + y.to_s] = 1
-      x = SQUARE_DISTANCE
-      y += SQUARE_DISTANCE
-    end
-    squares;
   end
 end
