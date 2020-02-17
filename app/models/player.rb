@@ -1,6 +1,6 @@
 class Player
   START_COORDINATES = {'x' => 60, 'y' => 60}
-  VELOCITY = 5
+  VELOCITY = 2
   ANIMATION_FRAME_RATE = 30.0
 
   def self.create_player(game_data)
@@ -48,9 +48,9 @@ class Player
         player['lastEvent'] = game_data['gameEvent']
         player['location'] = game_data['location']
         player['angle'] = game_data['angle']
-        player['updatedAt'] = (Time.now.to_f * 1000).round
         player['isAccelerating'] = true if game_data['gameEvent'] == 'up'
         player['isAccelerating'] = false if game_data['gameEvent'] == 'upStop'
+        player['updatedAt'] = (Time.now.to_f * 1000).round
         updated_player = player
       end
       player
