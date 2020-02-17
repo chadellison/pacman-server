@@ -11,7 +11,10 @@ class Player
       'location' => START_COORDINATES,
       'velocity' => VELOCITY,
       'angle' => 0,
-      'isAccelerating' => false
+      'isAccelerating' => false,
+      'lastAccelerationTime' => 0,
+      'lastEvent' => game_data['gameEvent'],
+      'updatedAt' => (Time.now.to_f * 1000).round
     }
   end
 
@@ -27,18 +30,8 @@ class Player
   def self.add_player(game_data)
     player = create_player(game_data)
     players = get_players << player
-
-    updated_player = nil
-    updated_players = players.map do |player|
-      if player['id'] == game_data['id']
-        player['lastEvent'] = game_data['gameEvent']
-        player['updatedAt'] = (Time.now.to_f * 1000).round
-        updated_player = player
-      end
-      player
-    end
-    REDIS.set('players', updated_players.to_json)
-    updated_player
+    REDIS.set('players', players.to_json)
+    player
   end
 
   def self.updated_player_for_move_event(game_data)
@@ -50,6 +43,7 @@ class Player
         player['angle'] = game_data['angle']
         player['isAccelerating'] = true if game_data['gameEvent'] == 'up'
         player['isAccelerating'] = false if game_data['gameEvent'] == 'upStop'
+        player['lastAccelerationTime'] = (Time.now.to_f * 1000).round if game_data['gameEvent'] == 'upStop'
         player['updatedAt'] = (Time.now.to_f * 1000).round
         updated_player = player
       end
