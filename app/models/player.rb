@@ -50,6 +50,7 @@ class Player
         player['angle'] = game_data['angle']
         player['updatedAt'] = (Time.now.to_f * 1000).round
         player['isAccelerating'] = true if game_data['gameEvent'] == 'up'
+        player['isAccelerating'] = false if game_data['gameEvent'] == 'upStop'
         updated_player = player
       end
       player
