@@ -11,8 +11,10 @@ class Player
       'location' => START_COORDINATES,
       'velocity' => VELOCITY,
       'angle' => 0,
+      'trajectory' => 0,
       'isAccelerating' => false,
       'lastAccelerationTime' => 0,
+      'rotation' => 'none',
       'lastEvent' => game_data['gameEvent'],
       'updatedAt' => (Time.now.to_f * 1000).round
     }
@@ -38,12 +40,11 @@ class Player
     updated_player = nil
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
+        player = handleAcceleration(player, game_data['gameEvent']) if ['up', 'upStop'].include?(game_data['gameEvent'])
+        player = handleRotation(player, game_data['gameEvent']) if ['left', 'right', 'leftStop', 'rightStop'].include?(game_data['gameEvent'])
         player['lastEvent'] = game_data['gameEvent']
         player['location'] = game_data['location']
         player['angle'] = game_data['angle']
-        player['isAccelerating'] = true if game_data['gameEvent'] == 'up'
-        player['isAccelerating'] = false if game_data['gameEvent'] == 'upStop'
-        player['lastAccelerationTime'] = (Time.now.to_f * 1000).round if game_data['gameEvent'] == 'upStop'
         player['updatedAt'] = (Time.now.to_f * 1000).round
         updated_player = player
       end
@@ -51,6 +52,27 @@ class Player
     end
     REDIS.set('players', updated_players.to_json)
     updated_player
+  end
+
+  def self.handleAcceleration(player, game_event)
+    if game_event == 'up'
+      player['isAccelerating'] = true
+    else
+      player['isAccelerating'] = false if game_event == 'upStop'
+      player['lastAccelerationTime'] = (Time.now.to_f * 1000).round if game_event == 'upStop'
+    end
+    player['trajectory'] = player['angle']
+
+    player
+  end
+
+  def self.handleRotation(player, game_event)
+    if (['leftStop', 'rightStop'].include?(game_event))
+      player['rotation'] = 'none'
+    else
+      player['rotation'] = game_event
+    end
+    player
   end
 
   def self.remove_player(userId)
