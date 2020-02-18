@@ -1,8 +1,6 @@
 class Game
   DEFAULT_BOARD_WITH = 980
   DEFAULT_BOARD_HEIGHT = 665
-  SQUARE_DISTANCE = 35;
-  PACMAN_RADIUS = 25;
 
   def self.create_game
     game = {
