@@ -1,6 +1,6 @@
 class Player
   START_COORDINATES = {'x' => 60, 'y' => 60}
-  VELOCITY = 2
+  VELOCITY = 4
   ANIMATION_FRAME_RATE = 30.0
 
   def self.create_player(game_data)
