@@ -1,6 +1,5 @@
 class GameDataChannel < ApplicationCable::Channel
   def subscribed
-    # conversation = Conversation.find(params[:conversation])
     stream_from 'game_data'
   end
 
