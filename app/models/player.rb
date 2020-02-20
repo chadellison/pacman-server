@@ -46,8 +46,8 @@ class Player
         player = handleAcceleration(player, game_data['gameEvent']) if ['up', 'upStop'].include?(game_data['gameEvent'])
         player = handleRotation(player, game_data['gameEvent']) if ['left', 'right', 'leftStop', 'rightStop'].include?(game_data['gameEvent'])
 
-        updated_player = update_attributes(player, game_data)
-        player = updated_player
+        player = update_attributes(player, game_data)
+        updated_player = player
       end
       player
     end
@@ -74,8 +74,8 @@ class Player
         player['fire'] = game_data['gameEvent'] == 'fire'
         player['lastFired'] = (Time.now.to_f * 1000).round if game_data['gameEvent'] == 'fireStop'
 
-        updated_player = update_attributes(player, game_data)
-        player = updated_player
+        player = update_attributes(player, game_data)
+        updated_player = player
       end
       player
     end
