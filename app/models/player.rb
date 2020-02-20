@@ -66,6 +66,19 @@ class Player
     player
   end
 
+  def self.handle_fire(game_event)
+    updated_player = nil
+    updated_players = Player.get_players.map do |player|
+      if player['id'] == game_event['id']
+        player['lastEvent'] = game_event['gameEvent']
+        updated_player = player
+      end
+      player
+    end
+    REDIS.set('players', updated_players.to_json)
+    updated_player
+  end
+
   def self.handleRotation(player, game_event)
     if (['leftStop', 'rightStop'].include?(game_event))
       player['rotation'] = 'none'
