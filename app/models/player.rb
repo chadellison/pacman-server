@@ -15,6 +15,8 @@ class Player
       'accelerate' => false,
       'lastAccelerationTime' => 0,
       'rotate' => 'none',
+      'weapon' => 1,
+      'fire' => false,
       'lastFired' => 0,
       'lastEvent' => game_data['gameEvent'],
       'updatedAt' => (Time.now.to_f * 1000).round
