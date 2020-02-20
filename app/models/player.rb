@@ -12,9 +12,10 @@ class Player
       'velocity' => VELOCITY,
       'angle' => 0,
       'trajectory' => 0,
-      'isAccelerating' => false,
+      'accelerate' => false,
       'lastAccelerationTime' => 0,
-      'rotation' => 'none',
+      'rotate' => 'none',
+      'lastFired' => 0,
       'lastEvent' => game_data['gameEvent'],
       'updatedAt' => (Time.now.to_f * 1000).round
     }
@@ -42,11 +43,8 @@ class Player
       if player['id'] == game_data['id']
         player = handleAcceleration(player, game_data['gameEvent']) if ['up', 'upStop'].include?(game_data['gameEvent'])
         player = handleRotation(player, game_data['gameEvent']) if ['left', 'right', 'leftStop', 'rightStop'].include?(game_data['gameEvent'])
-        player['lastEvent'] = game_data['gameEvent']
-        player['location'] = game_data['location']
-        player['angle'] = game_data['angle']
-        player['updatedAt'] = (Time.now.to_f * 1000).round
-        updated_player = player
+
+        updated_player = update_attributes(player, game_data)
       end
       player
     end
@@ -56,9 +54,9 @@ class Player
 
   def self.handleAcceleration(player, game_event)
     if game_event == 'up'
-      player['isAccelerating'] = true
+      player['accelerate'] = true
     else
-      player['isAccelerating'] = false if game_event == 'upStop'
+      player['accelerate'] = false if game_event == 'upStop'
       player['lastAccelerationTime'] = (Time.now.to_f * 1000).round if game_event == 'upStop'
     end
     player['trajectory'] = player['angle']
@@ -66,12 +64,14 @@ class Player
     player
   end
 
-  def self.handle_fire(game_event)
+  def self.handle_fire(game_data)
     updated_player = nil
     updated_players = Player.get_players.map do |player|
-      if player['id'] == game_event['id']
-        player['lastEvent'] = game_event['gameEvent']
-        updated_player = player
+      if player['id'] == game_data['id']
+        player['fire'] = game_data['gameEvent'] == 'fire'
+        player['lastFired'] = (Time.now.to_f * 1000).round if game_data['gameEvent'] == 'fireStop'
+
+        updated_player = update_attributes(player, game_data)
       end
       player
     end
@@ -81,9 +81,9 @@ class Player
 
   def self.handleRotation(player, game_event)
     if (['leftStop', 'rightStop'].include?(game_event))
-      player['rotation'] = 'none'
+      player['rotate'] = 'none'
     else
-      player['rotation'] = game_event
+      player['rotate'] = game_event
     end
     player
   end
@@ -92,5 +92,13 @@ class Player
     updated_players = get_players.reject { |player| player['id'] == userId }
     REDIS.set('players', updated_players.to_json)
     {id: userId, lastEvent: 'remove'}
+  end
+
+  def self.update_attributes(player, game_data)
+    player['lastEvent'] = game_data['gameEvent']
+    player['location'] = game_data['location']
+    player['angle'] = game_data['angle']
+    player['updatedAt'] = (Time.now.to_f * 1000).round
+    player
   end
 end
