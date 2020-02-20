@@ -47,6 +47,7 @@ class Player
         player = handleRotation(player, game_data['gameEvent']) if ['left', 'right', 'leftStop', 'rightStop'].include?(game_data['gameEvent'])
 
         updated_player = update_attributes(player, game_data)
+        player = updated_player
       end
       player
     end
@@ -74,6 +75,7 @@ class Player
         player['lastFired'] = (Time.now.to_f * 1000).round if game_data['gameEvent'] == 'fireStop'
 
         updated_player = update_attributes(player, game_data)
+        player = updated_player
       end
       player
     end
