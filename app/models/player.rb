@@ -21,7 +21,7 @@ class Player
       hitpoints: game_data['hitpoints'],
       maxHitpoints: game_data['maxHitpoints'],
       armor: game_data['armor'],
-      lives: 3,
+      lives: game_data['lives'],
       lastEvent: game_data['gameEvent'],
       updatedAt: (Time.now.to_f * 1000).round
     }
