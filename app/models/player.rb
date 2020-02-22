@@ -5,21 +5,25 @@ class Player
 
   def self.create_player(game_data)
     player = {
-      'id' => game_data['id'],
-      'name' => Faker::Name.name,
-      'score' => 0,
-      'location' => START_COORDINATES,
-      'velocity' => VELOCITY,
-      'angle' => 0,
-      'trajectory' => 0,
-      'accelerate' => false,
-      'lastAccelerationTime' => 0,
-      'rotate' => 'none',
-      'weapon' => 1,
-      'fire' => false,
-      'lastFired' => 0,
-      'lastEvent' => game_data['gameEvent'],
-      'updatedAt' => (Time.now.to_f * 1000).round
+      id: game_data['id'],
+      name: Faker::Name.name,
+      score: 0,
+      location: START_COORDINATES,
+      velocity: VELOCITY,
+      angle: 0,
+      trajectory: 0,
+      accelerate: false,
+      lastAccelerationTime: 0,
+      rotate: 'none',
+      weapon: 1,
+      fire: false,
+      lastFired: 0,
+      hitpoints: game_data['hitpoints'],
+      maxHitpoints: game_data['maxHitpoints'],
+      armor: game_data['armor'],
+      lives: 3,
+      lastEvent: game_data['gameEvent'],
+      updatedAt: (Time.now.to_f * 1000).round
     }
   end
 
@@ -90,6 +94,23 @@ class Player
       player['rotate'] = game_event
     end
     player
+  end
+
+  def self.explode_player(game_data)
+    updated_player = nil
+    updated_players = Player.get_players.map do |player|
+      if player['id'] == game_data['id']
+        player['lives'] = game_data['lives']
+        player['hitpoints'] = game_data['hitpoints']
+        player['lastEvent'] = game_data['gameEvent']
+
+        player = update_attributes(player, game_data)
+        updated_player = player
+      end
+      player
+    end
+    REDIS.set('players', updated_players.to_json)
+    updated_player
   end
 
   def self.remove_player(userId)
