@@ -18,6 +18,7 @@ class Player
       weapon: 1,
       fire: false,
       lastFired: 0,
+      explode: false,
       hitpoints: game_data['hitpoints'],
       maxHitpoints: game_data['maxHitpoints'],
       armor: game_data['armor'],
@@ -96,27 +97,16 @@ class Player
     player
   end
 
-  def self.explode_player(game_data)
-    updated_player = nil
-    updated_players = Player.get_players.map do |player|
-      if player['id'] == game_data['id']
-        player['lives'] = game_data['lives']
-        player['hitpoints'] = game_data['hitpoints']
-        player['lastEvent'] = game_data['gameEvent']
-
-        player = update_attributes(player, game_data)
-        updated_player = player
-      end
-      player
-    end
-    REDIS.set('players', updated_players.to_json)
-    updated_player
-  end
-
   def self.remove_player(userId)
     updated_players = get_players.reject { |player| player['id'] == userId }
     REDIS.set('players', updated_players.to_json)
-    {id: userId, lastEvent: 'remove'}
+    {
+      id: userId,
+      lastEvent: 'remove',
+      explodeAnimation: {x: 0, y: 0},
+      explode: true,
+      updatedAt: (Time.now.to_f * 1000).round
+    }
   end
 
   def self.update_attributes(player, game_data)
