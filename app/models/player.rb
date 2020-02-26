@@ -111,6 +111,8 @@ class Player
     player['lastEvent'] = game_data['gameEvent']
     player['location'] = game_data['location']
     player['angle'] = game_data['angle']
+    player['hitpoints'] = game_data['hitpoints']
+    player['lives'] = game_data['lives']
     player['updatedAt'] = (Time.now.to_f * 1000).round
     player
   end
