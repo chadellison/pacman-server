@@ -17,7 +17,6 @@ class Player
       rotate: 'none',
       weapon: 1,
       fire: false,
-      lastFired: 0,
       explode: false,
       hitpoints: game_data['hitpoints'],
       maxHitpoints: game_data['maxHitpoints'],
@@ -77,7 +76,6 @@ class Player
     updated_players = Player.get_players.map do |player|
       if player['id'] == game_data['id']
         player['fire'] = game_data['gameEvent'] == 'fire'
-        player['lastFired'] = (Time.now.to_f * 1000).round
 
         player = update_attributes(player, game_data)
         updated_player = player
