@@ -15,7 +15,7 @@ class Player
       accelerate: false,
       lastAccelerationTime: 0,
       rotate: 'none',
-      weapon: 1,
+      weaponIndex: game_data['weaponIndex'],
       fire: false,
       explode: false,
       hitpoints: game_data['hitpoints'],
@@ -23,7 +23,7 @@ class Player
       armor: game_data['armor'],
       lives: game_data['lives'],
       lastEvent: game_data['gameEvent'],
-      ship: game_data['ship'],
+      shipIndex: game_data['shipIndex'],
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
