@@ -23,6 +23,7 @@ class Player
       armor: game_data['armor'],
       lives: game_data['lives'],
       lastEvent: game_data['gameEvent'],
+      ship: game_data['ship'],
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
