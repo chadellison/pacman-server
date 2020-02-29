@@ -1,6 +1,5 @@
 class Player
   START_COORDINATES = {'x' => 60, 'y' => 60}
-  VELOCITY = 4
   ANIMATION_FRAME_RATE = 30.0
 
   def self.create_player(game_data)
@@ -9,7 +8,7 @@ class Player
       name: Faker::Name.name,
       score: 0,
       location: START_COORDINATES,
-      velocity: VELOCITY,
+      velocity: game_data['velocity'],
       angle: 0,
       trajectory: 0,
       accelerate: false,
