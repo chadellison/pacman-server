@@ -7,6 +7,7 @@ class Player
       id: game_data['id'],
       name: Faker::Name.name,
       score: 0,
+      gold: game_data['gold'],
       location: START_COORDINATES,
       velocity: game_data['velocity'],
       angle: 0,
@@ -113,6 +114,8 @@ class Player
     player['angle'] = game_data['angle']
     player['hitpoints'] = game_data['hitpoints']
     player['lives'] = game_data['lives']
+    player['gold'] = game_data['gold']
+    player['score'] = game_data['score']
     player['updatedAt'] = (Time.now.to_f * 1000).round
     player
   end
