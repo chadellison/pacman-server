@@ -5,8 +5,7 @@ class Player
   def self.create_player(game_data)
     player = {
       id: game_data['id'],
-      name: Faker::Name.name,
-      score: 0,
+      score: game_data['score'],
       gold: game_data['gold'],
       location: START_COORDINATES,
       velocity: game_data['velocity'],
