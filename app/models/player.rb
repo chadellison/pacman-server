@@ -23,6 +23,7 @@ class Player
       lives: game_data['lives'],
       lastEvent: game_data['gameEvent'],
       shipIndex: game_data['shipIndex'],
+      items: game_data['items'],
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
@@ -115,6 +116,7 @@ class Player
     player['lives'] = game_data['lives']
     player['gold'] = game_data['gold']
     player['score'] = game_data['score']
+    player['items'] = game_data['items']
     player['updatedAt'] = (Time.now.to_f * 1000).round
     player
   end
