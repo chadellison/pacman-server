@@ -1,11 +1,11 @@
 class Game
-  DEFAULT_BOARD_WITH = 980
+  DEFAULT_BOARD_WIDTH = 980
   DEFAULT_BOARD_HEIGHT = 665
 
   def self.create_game
     game = {
       board: {
-        width: DEFAULT_BOARD_WITH,
+        width: DEFAULT_BOARD_WIDTH,
         height: DEFAULT_BOARD_HEIGHT
       }
     }
