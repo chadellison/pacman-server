@@ -20,7 +20,6 @@ class Player
       hitpoints: game_data['hitpoints'],
       maxHitpoints: game_data['maxHitpoints'],
       armor: game_data['armor'],
-      lives: game_data['lives'],
       lastEvent: game_data['gameEvent'],
       shipIndex: game_data['shipIndex'],
       items: game_data['items'],
@@ -113,7 +112,6 @@ class Player
     player['location'] = game_data['location']
     player['angle'] = game_data['angle']
     player['hitpoints'] = game_data['hitpoints']
-    player['lives'] = game_data['lives']
     player['gold'] = game_data['gold']
     player['score'] = game_data['score']
     player['items'] = game_data['items']
