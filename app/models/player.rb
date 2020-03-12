@@ -15,6 +15,7 @@ class Player
       lastAccelerationTime: 0,
       rotate: 'none',
       weaponIndex: game_data['weaponIndex'],
+      damage: game_data['damage'],
       fire: false,
       explode: false,
       hitpoints: game_data['hitpoints'],
