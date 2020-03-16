@@ -33,31 +33,28 @@ class Player
     if json_players.present?
       JSON.parse(json_players)
     else
-      []
+      {}
     end
   end
 
   def self.add_player(game_data)
     player = create_player(game_data)
-    players = get_players << player
+    players = get_players
+    players[player[:id]] = player
     REDIS.set('players', players.to_json)
     player
   end
 
   def self.updated_player_for_move_event(game_data)
-    updated_player = nil
-    updated_players = Player.get_players.map do |player|
-      if player['id'] == game_data['id']
-        player = handleAcceleration(player, game_data['gameEvent']) if ['up', 'upStop'].include?(game_data['gameEvent'])
-        player = handleRotation(player, game_data['gameEvent']) if ['left', 'right', 'leftStop', 'rightStop'].include?(game_data['gameEvent'])
+    players = Player.get_players
+    player = players[game_data['id'].to_s]
+    player = handleAcceleration(player, game_data['gameEvent']) if ['up', 'upStop'].include?(game_data['gameEvent'])
+    player = handleRotation(player, game_data['gameEvent']) if ['left', 'right', 'leftStop', 'rightStop'].include?(game_data['gameEvent'])
+    player = update_attributes(player, game_data)
 
-        player = update_attributes(player, game_data)
-        updated_player = player
-      end
-      player
-    end
-    REDIS.set('players', updated_players.to_json)
-    updated_player
+    players[player['id']] = player
+    REDIS.set('players', players.to_json)
+    player
   end
 
   def self.handleAcceleration(player, game_event)
@@ -72,21 +69,6 @@ class Player
     player
   end
 
-  def self.handle_fire(game_data)
-    updated_player = nil
-    updated_players = Player.get_players.map do |player|
-      if player['id'] == game_data['id']
-        player['fire'] = game_data['gameEvent'] == 'fire'
-
-        player = update_attributes(player, game_data)
-        updated_player = player
-      end
-      player
-    end
-    REDIS.set('players', updated_players.to_json)
-    updated_player
-  end
-
   def self.handleRotation(player, game_event)
     if (['leftStop', 'rightStop'].include?(game_event))
       player['rotate'] = 'none'
@@ -96,9 +78,20 @@ class Player
     player
   end
 
+  def self.handle_fire(game_data)
+    players = Player.get_players
+    player = players[game_data['id'].to_s]
+    player['fire'] = game_data['gameEvent'] == 'fire'
+    player = update_attributes(player, game_data)
+    players[player['id']] = player
+    REDIS.set('players', players.to_json)
+    player
+  end
+
   def self.remove_player(userId)
-    updated_players = get_players.reject { |player| player['id'] == userId }
-    REDIS.set('players', updated_players.to_json)
+    players = Player.get_players
+    players.delete(userId.to_s)
+    REDIS.set('players', players.to_json)
     {
       id: userId,
       lastEvent: 'remove',
