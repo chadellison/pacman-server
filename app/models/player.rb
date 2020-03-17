@@ -1,6 +1,5 @@
 class Player
   START_COORDINATES = {'x' => 60, 'y' => 60}
-  ANIMATION_FRAME_RATE = 30.0
 
   def self.create_player(game_data)
     player = {
@@ -83,6 +82,23 @@ class Player
     player = players[game_data['id'].to_s]
     player['fire'] = game_data['gameEvent'] == 'fire'
     player = update_attributes(player, game_data)
+    players[player['id']] = player
+    REDIS.set('players', players.to_json)
+    player
+  end
+
+  def self.handle_shop(game_data)
+    players = Player.get_players
+    player = players[game_data['id'].to_s]
+    player['lastEvent'] = 'shop'
+    player['armor'] = game_data['armor']
+    player['shipIndex'] = game_data['shipIndex']
+    player['weaponIndex'] = game_data['weaponIndex']
+    player['maxHitpoints'] = game_data['maxHitpoints']
+    player['damage'] = game_data['damage']
+    player['velocity'] = game_data['velocity']
+    player = update_attributes(player, game_data)
+
     players[player['id']] = player
     REDIS.set('players', players.to_json)
     player
