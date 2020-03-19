@@ -60,30 +60,8 @@ class Player
   def self.update_player(player_data)
     players = Player.get_players
     current_time = (Time.now.to_f * 1000).round
+    player_data['lastAccelerationTime'] = current_time if player_data['gameEvent'] == 'upStop'
     player_data['updatedAt'] = current_time
-
-    case player_data['gameEvent']
-    when 'up'
-      player_data['accelerate'] = true
-      player_data['trajectory'] = player_data['angle']
-    when 'upStop'
-      player_data['accelerate'] = false
-      player_data['lastAccelerationTime'] = current_time
-      player_data['trajectory'] = player_data['angle']
-    when 'left'
-      player_data['rotate'] = player_data['gameEvent']
-    when 'right'
-      player_data['rotate'] = player_data['gameEvent']
-    when 'leftStop'
-      player_data['rotate'] = 'none'
-    when 'rightStop'
-      player_data['rotate'] = 'none'
-    when 'fire'
-      player_data['fire'] = player_data['gameEvent'] == 'fire'
-    when 'fireStop'
-      player_data['fire'] = player_data['gameEvent'] == 'fire'
-    end
-
     players[player_data['id']] = player_data
     REDIS.set('players', players.to_json)
     player_data
