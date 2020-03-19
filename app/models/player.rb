@@ -59,11 +59,48 @@ class Player
 
   def self.update_player(player_data)
     players = Player.get_players
-    current_time = (Time.now.to_f * 1000).round
-    player_data['lastAccelerationTime'] = current_time if player_data['gameEvent'] == 'upStop'
-    player_data['updatedAt'] = current_time
-    players[player_data['id']] = player_data
+    player = players[player_data['id'].to_s]
+    case player_data['gameEvent']
+    when 'up'
+      player['accelerate'] = true
+      player['trajectory'] = player_data['angle']
+    when 'upStop'
+      player['accelerate'] = false
+      player['trajectory'] = player_data['angle']
+      player['lastAccelerationTime'] = (Time.now.to_f * 1000).round
+    when 'left'
+      player['rotate'] = 'left'
+    when 'leftStop'
+      player['rotate'] = 'none'
+    when 'right'
+      player['rotate'] = 'right'
+    when 'rightStop'
+      player['rotate'] = 'none'
+    when 'fire'
+      player['fire'] = true
+    when 'fireStop'
+      player['fire'] = false
+    when 'shop'
+      player['armor'] = player_data['armor']
+      player['damage'] = player_data['damage']
+      player['weapons'] = player_data['weapons']
+      player['velocity'] = player_data['velocity']
+      player['shipIndex'] = player_data['shipIndex']
+      player['maxHitpoints'] = player_data['maxHitpoints']
+    end
+
+    player['gameEvent'] = player_data['gameEvent']
+    player['location'] = player_data['location']
+    player['angle'] = player_data['angle']
+    player['hitpoints'] = player_data['hitpoints']
+    player['lives'] = player_data['lives']
+    player['gold'] = player_data['gold']
+    player['score'] = player_data['score']
+    player['items'] = player_data['items']
+    player['updatedAt'] = current_time = (Time.now.to_f * 1000).round
+
+    players[player['id']] = player
     REDIS.set('players', players.to_json)
-    player_data
+    player
   end
 end
