@@ -83,7 +83,7 @@ class Player
     when 'shop'
       player['armor'] = player_data['armor']
       player['damage'] = player_data['damage']
-      player['weapons'] = player_data['weapons']
+      player['weaponIndex'] = player_data['weaponIndex']
       player['velocity'] = player_data['velocity']
       player['shipIndex'] = player_data['shipIndex']
       player['maxHitpoints'] = player_data['maxHitpoints']
