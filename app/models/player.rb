@@ -63,10 +63,10 @@ class Player
     case player_data['gameEvent']
     when 'up'
       player['accelerate'] = true
-      player['trajectory'] = player_data['angle']
+      player['trajectory'] = player_data['trajectory']
     when 'upStop'
       player['accelerate'] = false
-      player['trajectory'] = player_data['angle']
+      player['trajectory'] = player_data['trajectory']
       player['lastAccelerationTime'] = (Time.now.to_f * 1000).round
     when 'left'
       player['rotate'] = 'left'
