@@ -13,7 +13,6 @@ class Player
       rotate: 'none',
       weaponIndex: game_data['weaponIndex'],
       damage: game_data['damage'],
-      fire: false,
       explode: false,
       hitpoints: game_data['hitpoints'],
       maxHitpoints: game_data['maxHitpoints'],
@@ -74,10 +73,6 @@ class Player
       player['rotate'] = 'right'
     when 'rightStop'
       player['rotate'] = 'none'
-    when 'fire'
-      player['fire'] = true
-    when 'fireStop'
-      player['fire'] = false
     when 'shop'
       player['armor'] = player_data['armor']
       player['damage'] = player_data['damage']
