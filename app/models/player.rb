@@ -1,15 +1,13 @@
 class Player
-  START_COORDINATES = {'x' => 60, 'y' => 60}
-
   def self.create_player(game_data)
     player = {
       id: game_data['id'],
       score: game_data['score'],
       gold: game_data['gold'],
-      location: START_COORDINATES,
+      location: game_data['location'],
       velocity: game_data['velocity'],
-      angle: 0,
-      trajectory: 0,
+      angle: game_data['angle'],
+      trajectory: game_data['trajectory'],
       accelerate: false,
       lastAccelerationTime: 0,
       rotate: 'none',
