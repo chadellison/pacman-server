@@ -86,14 +86,10 @@ class Player
     player['location'] = player_data['location']
     player['angle'] = player_data['angle']
     player['hitpoints'] = player_data['hitpoints']
-    player['lives'] = player_data['lives']
     player['gold'] = player_data['gold']
     player['score'] = player_data['score']
     player['items'] = player_data['items']
-    player['sentTime'] = player_data['sentTime']
-    current_time = (Time.now.to_f * 1000).round
-    player['updatedAt'] = current_time
-    player['timeDifference'] = current_time - Time.at(player_data['sentTime'].to_f).utc.to_f
+    player['updatedAt'] = (Time.now.to_f * 1000).round
 
     players[player['id']] = player
     REDIS.set('players', players.to_json)
