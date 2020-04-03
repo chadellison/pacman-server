@@ -95,4 +95,20 @@ class Player
     REDIS.set('players', players.to_json)
     player
   end
+
+  def self.deploy_supply_ship
+    {
+      id: 'ai',
+      location: {x: 1800, y: 1125},
+      angle: 1,
+      items: [],
+      gold: rand(100..900),
+      armor: rand(6),
+      trajectory: rand(360),
+      rotate: 'left',
+      hitpoints: 500,
+      gameEvent: 'supplyShip',
+      updatedAt: (Time.now.to_f * 1000).round
+    }
+  end
 end
