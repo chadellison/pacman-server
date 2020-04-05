@@ -20,6 +20,7 @@ class Player
       gameEvent: game_data['gameEvent'],
       shipIndex: game_data['shipIndex'],
       items: game_data['items'],
+      effects: game_data['effects'],
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
@@ -89,6 +90,7 @@ class Player
     player['gold'] = player_data['gold']
     player['score'] = player_data['score']
     player['items'] = player_data['items']
+    player['effects'] = player_data['effects']
     player['updatedAt'] = (Time.now.to_f * 1000).round
 
     players[player['id']] = player
@@ -101,12 +103,14 @@ class Player
       id: 'ai',
       location: {x: 1800, y: 1125},
       angle: 1,
-      items: [],
+      items: {},
+      effects: [],
       gold: rand(100..900),
       armor: rand(6),
       trajectory: rand(360),
       rotate: 'left',
       hitpoints: 500,
+      maxHitpoints: 500,
       gameEvent: 'supplyShip',
       updatedAt: (Time.now.to_f * 1000).round
     }
