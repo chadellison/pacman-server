@@ -17,8 +17,7 @@ class GameEvent
   def self.handle_event_count
     event_count = REDIS.get('event_count').to_i
     event_count += 1
-    player_size = Player.get_players.values.size
-    if event_count > (EVENT_DIVIDER * player_size)
+    if event_count > EVENT_DIVIDER
       event_count = 0
       supply_ship = Player.deploy_supply_ship
       GameEventBroadcastJob.perform_later(supply_ship)
