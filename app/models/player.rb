@@ -107,7 +107,7 @@ class Player
       location: {x: 1800, y: 1125},
       angle: 1,
       items: {},
-      effects: [],
+      effects: {},
       gold: rand(100..900),
       armor: rand(6),
       trajectory: rand(360),
