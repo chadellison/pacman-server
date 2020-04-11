@@ -101,8 +101,7 @@ class Player
   end
 
   def self.deploy_supply_ship
-    players = get_players
-    ai_player = {
+    {
       id: 'ai',
       location: {x: 1800, y: 1125},
       angle: 1,
@@ -117,8 +116,5 @@ class Player
       gameEvent: 'supplyShip',
       updatedAt: (Time.now.to_f * 1000).round
     }
-    players['ai'] = ai_player
-    REDIS.set('players', players.to_json)
-    ai_player
   end
 end
