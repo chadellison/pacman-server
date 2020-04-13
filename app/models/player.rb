@@ -21,6 +21,7 @@ class Player
       shipIndex: game_data['shipIndex'],
       items: game_data['items'],
       effects: game_data['effects'],
+      explodeAnimation: {},
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
@@ -115,6 +116,7 @@ class Player
       hitpoints: 500,
       maxHitpoints: 500,
       gameEvent: 'supplyShip',
+      explodeAnimation: {},
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
