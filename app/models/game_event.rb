@@ -20,7 +20,7 @@ class GameEvent
     if event_count > EVENT_DIVIDER
       event_count = 0
       supply_ship = Player.deploy_supply_ship
-      GameEventBroadcastJob.perform_later(supply_ship)
+      GameEventBroadcastJob.perform_later(supply_ship) if supply_ship
     end
     REDIS.set('event_count', event_count)
   end

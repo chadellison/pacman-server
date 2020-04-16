@@ -84,6 +84,7 @@ class Player
       player['maxHitpoints'] = player_data['maxHitpoints']
     when 'buff'
       player['buffIndex'] = player_data['buffIndex']
+      players.delete('ai')
     end
 
     player['gameEvent'] = player_data['gameEvent']
@@ -102,22 +103,28 @@ class Player
   end
 
   def self.deploy_supply_ship
-    {
-      id: 'ai',
-      location: {x: 1800, y: 1125},
-      angle: 1,
-      items: {},
-      effects: {},
-      score: 0,
-      golde: 0,
-      armor: rand(6),
-      trajectory: rand(360),
-      rotate: 'left',
-      hitpoints: 500,
-      maxHitpoints: 500,
-      gameEvent: 'supplyShip',
-      explodeAnimation: {},
-      updatedAt: (Time.now.to_f * 1000).round
-    }
+    players = get_players
+    if players['ai'].blank?
+      supply_ship = {
+        id: 'ai',
+        location: {x: 1800, y: 1125},
+        angle: 1,
+        items: {},
+        effects: {},
+        score: 0,
+        golde: 0,
+        armor: rand(6),
+        trajectory: rand(360),
+        rotate: 'left',
+        hitpoints: 500,
+        maxHitpoints: 500,
+        gameEvent: 'supplyShip',
+        explodeAnimation: {},
+        updatedAt: (Time.now.to_f * 1000).round
+      }
+      players['ai'] = supply_ship
+      REDIS.set('players', players.to_json)
+      supply_ship
+    end
   end
 end
