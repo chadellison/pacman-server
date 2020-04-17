@@ -85,7 +85,6 @@ class Player
       player['maxHitpoints'] = player_data['maxHitpoints']
     when 'buff'
       player['buffIndex'] = player_data['buffIndex']
-      players.delete('ai')
     end
 
     player['gameEvent'] = player_data['gameEvent']
