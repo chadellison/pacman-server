@@ -52,6 +52,7 @@ class Player
       gameEvent: 'remove',
       explodeAnimation: {x: 0, y: 0},
       explode: true,
+      effects: {},
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
