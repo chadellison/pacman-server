@@ -10,6 +10,7 @@ class Player
       trajectory: game_data['trajectory'],
       accelerate: false,
       lastAccelerationTime: 0,
+      consecutiveKills: 0,
       rotate: 'none',
       weaponIndex: game_data['weaponIndex'],
       damage: game_data['damage'],
@@ -88,6 +89,7 @@ class Player
     end
 
     player['gameEvent'] = player_data['gameEvent']
+    player['consecutiveKills'] = player_data['consecutiveKills']
     player['location'] = player_data['location']
     player['angle'] = player_data['angle']
     player['hitpoints'] = player_data['hitpoints']
@@ -96,7 +98,6 @@ class Player
     player['items'] = player_data['items']
     player['effects'] = player_data['effects']
     player['updatedAt'] = (Time.now.to_f * 1000).round
-
     players[player['id']] = player
     REDIS.set('players', players.to_json)
     player
@@ -126,5 +127,10 @@ class Player
       REDIS.set('players', players.to_json)
       supply_ship
     end
+  end
+
+  def self.handle_game_over(player_data)
+    REDIS.set('players', {}.to_json)
+    player_data
   end
 end

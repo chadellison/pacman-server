@@ -7,6 +7,8 @@ class GameEvent
       player = Player.add_player(game_data)
     when 'remove'
       player = Player.remove_player(game_data['id'])
+    when 'gameOver'
+      player = Player.handle_game_over(game_data)
     else
       handle_event_count
       player = Player.update_player(game_data)
