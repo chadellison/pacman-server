@@ -2,6 +2,7 @@ class Player
   def self.create_player(game_data)
     player = {
       id: game_data['id'],
+      name: game_data['name'],
       score: game_data['score'],
       gold: game_data['gold'],
       location: game_data['location'],
