@@ -24,6 +24,7 @@ class Player
       items: game_data['items'],
       effects: game_data['effects'],
       explodeAnimation: {},
+      killedBy: nil,
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
@@ -98,36 +99,34 @@ class Player
     player['score'] = player_data['score']
     player['items'] = player_data['items']
     player['effects'] = player_data['effects']
+    player['killedBy'] = player_data['killedBy']
     player['updatedAt'] = (Time.now.to_f * 1000).round
     players[player['id']] = player
     REDIS.set('players', players.to_json)
     player
   end
 
-  def self.deploy_supply_ship
+  def self.deploy_supply_ship(id)
     players = get_players
-    if players['ai'].blank?
-      supply_ship = {
-        id: 'ai',
-        location: {x: 1800, y: 1125},
-        angle: 1,
-        items: {},
-        effects: {},
-        score: 0,
-        golde: 0,
-        armor: rand(6),
-        trajectory: rand(360),
-        rotate: 'left',
-        hitpoints: 500,
-        maxHitpoints: 500,
-        gameEvent: 'supplyShip',
-        explodeAnimation: {},
-        updatedAt: (Time.now.to_f * 1000).round
-      }
-      players['ai'] = supply_ship
-      REDIS.set('players', players.to_json)
-      supply_ship
-    end
+    supply_ship = {
+      id: id,
+      type: 'ai',
+      location: {x: 1800, y: 1125},
+      angle: 1,
+      effects: {},
+      score: 0,
+      armor: rand(6),
+      trajectory: rand(360),
+      rotate: 'left',
+      hitpoints: 500,
+      maxHitpoints: 500,
+      gameEvent: 'supplyShip',
+      explodeAnimation: {},
+      updatedAt: (Time.now.to_f * 1000).round
+    }
+    players[id] = supply_ship
+    REDIS.set('players', players.to_json)
+    supply_ship
   end
 
   def self.handle_game_over(player_data)
