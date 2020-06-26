@@ -1,5 +1,5 @@
 class Player
-  def self.create_player(game_data)
+  def self.create_player(game_data, team)
     player = {
       id: game_data['id'],
       name: game_data['name'],
@@ -25,6 +25,7 @@ class Player
       effects: game_data['effects'],
       explodeAnimation: {},
       killedBy: nil,
+      team: team,
       updatedAt: (Time.now.to_f * 1000).round
     }
   end
@@ -39,11 +40,17 @@ class Player
   end
 
   def self.add_player(game_data)
-    player = create_player(game_data)
     players = get_players
+    team = find_team(players, game_data['team'])
+    player = create_player(game_data, team)
     players[player[:id]] = player
     REDIS.set('players', players.to_json)
     player
+  end
+
+  def self.find_team(players, team)
+    return team if team.present?
+    players.values.count { |p| p['type'] != 'ai' }.even? ? 'red' : 'blue'
   end
 
   def self.remove_player(userId)
