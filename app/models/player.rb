@@ -2,6 +2,7 @@ class Player
   def self.create_player(game_data, team)
     player = {
       id: game_data['id'],
+      type: 'human',
       name: game_data['name'],
       score: game_data['score'],
       gold: game_data['gold'],
@@ -11,7 +12,7 @@ class Player
       trajectory: game_data['trajectory'],
       accelerate: false,
       lastAccelerationTime: 0,
-      consecutiveKills: 0,
+      kills: 0,
       rotate: 'none',
       weaponIndex: game_data['weaponIndex'],
       damage: game_data['damage'],
@@ -111,33 +112,5 @@ class Player
     players[player['id']] = player
     REDIS.set('players', players.to_json)
     player
-  end
-
-  def self.deploy_supply_ship(id)
-    players = get_players
-    supply_ship = {
-      id: id,
-      type: 'ai',
-      location: {x: 1800, y: 1125},
-      angle: 1,
-      effects: {},
-      score: 0,
-      armor: rand(6),
-      trajectory: rand(360),
-      rotate: 'left',
-      hitpoints: 500,
-      maxHitpoints: 500,
-      gameEvent: 'supplyShip',
-      explodeAnimation: {},
-      updatedAt: (Time.now.to_f * 1000).round
-    }
-    players[id] = supply_ship
-    REDIS.set('players', players.to_json)
-    supply_ship
-  end
-
-  def self.handle_game_over(player_data)
-    REDIS.set('players', {}.to_json)
-    player_data
   end
 end
