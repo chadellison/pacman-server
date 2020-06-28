@@ -67,25 +67,14 @@ class AiPlayer
   def self.handle_leak(game_data)
     players = Player.get_players
     players.delete(game_data['id'].to_s)
-    
+
     leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
     if leaks == 10
-      handle_game_over(game_data)
+      Game.handle_game_over(game_data)
     else
       REDIS.set(game_data['team'] + '_leaks', leaks)
       REDIS.set('players', players.to_json)
       game_data
     end
-  end
-
-  def self.handle_game_over(game_data)
-    REDIS.set('players', {}.to_json)
-    REDIS.set('sequence', 0)
-    REDIS.set('event_count', 0)
-    REDIS.set('red_events', 0)
-    REDIS.set('blue_events', 0)
-    REDIS.set('red_leaks', 0)
-    REDIS.set('blue_leaks', 0)
-    { gameEvent: 'gameOver' }
   end
 end

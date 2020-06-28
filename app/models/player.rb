@@ -19,6 +19,7 @@ class Player
     team = find_team(players, game_data['team'])
     player = create_player(game_data, team)
     players[player['id']] = player
+    remove_exploaded_player(player['id'])
     REDIS.set('players', players.to_json)
     player
   end
@@ -30,7 +31,9 @@ class Player
 
   def self.remove_player(userId)
     players = Player.get_players
-    players.delete(userId.to_s)
+    exploaded_player = players.delete(userId.to_s)
+    add_exploaded_player(exploaded_player) if exploaded_player['type'] == 'human'
+
     REDIS.set('players', players.to_json)
     {
       id: userId,
@@ -40,6 +43,27 @@ class Player
       effects: {},
       updatedAt: (Time.now.to_f * 1000).round
     }
+  end
+
+  def self.get_exploaded_players
+    exploded_players_json = REDIS.get('exploded_players')
+    if exploded_players_json.present?
+      JSON.parse(exploded_players_json)
+    else
+      {}
+    end
+  end
+
+  def self.add_exploaded_player(exploaded_player)
+    exploded_players = get_exploaded_players
+    exploded_players[exploaded_player['id']] = exploaded_player
+    REDIS.set('exploded_players', exploded_players.to_json)
+  end
+
+  def self.remove_exploaded_player(id)
+    exploded_players = get_exploaded_players
+    exploded_players.delete(id.to_s)
+    REDIS.set('exploded_players', exploded_players.to_json)
   end
 
   def self.update_player(player_data)
