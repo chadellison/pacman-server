@@ -17,7 +17,6 @@ class Player
   def self.add_player(game_data)
     players = get_players
     team = find_team(players, game_data['team'])
-    # remove player from explodedArray
     player = create_player(game_data, team)
     players[player['id']] = player
     REDIS.set('players', players.to_json)
@@ -32,7 +31,6 @@ class Player
   def self.remove_player(userId)
     players = Player.get_players
     players.delete(userId.to_s)
-    # add player to exploded array
     REDIS.set('players', players.to_json)
     {
       id: userId,
