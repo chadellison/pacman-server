@@ -82,8 +82,8 @@ class AiPlayer
     REDIS.set('players', {}.to_json)
     REDIS.set('sequence', 0)
     REDIS.set('event_count', 0)
-    REDIS.set('red', 0)
-    REDIS.set('blue', 0)
+    REDIS.set('red_events', 0)
+    REDIS.set('blue_events', 0)
     REDIS.set('red_leaks', 0)
     REDIS.set('blue_leaks', 0)
     { gameEvent: 'gameOver' }
