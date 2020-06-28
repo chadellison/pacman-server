@@ -67,7 +67,7 @@ class AiPlayer
   def self.handle_leak(game_data)
     players = Player.get_players
     players.delete(game_data['id'].to_s)
-
+    
     leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
     if leaks == 10
       handle_game_over(game_data)

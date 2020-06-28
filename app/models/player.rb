@@ -1,34 +1,8 @@
 class Player
   def self.create_player(game_data, team)
-    player = {
-      id: game_data['id'],
-      type: 'human',
-      name: game_data['name'],
-      score: game_data['score'],
-      gold: game_data['gold'],
-      location: game_data['location'],
-      velocity: game_data['velocity'],
-      angle: game_data['angle'],
-      trajectory: game_data['trajectory'],
-      accelerate: false,
-      lastAccelerationTime: 0,
-      kills: 0,
-      rotate: 'none',
-      weaponIndex: game_data['weaponIndex'],
-      damage: game_data['damage'],
-      explode: false,
-      hitpoints: game_data['hitpoints'],
-      maxHitpoints: game_data['maxHitpoints'],
-      armor: game_data['armor'],
-      gameEvent: game_data['gameEvent'],
-      shipIndex: game_data['shipIndex'],
-      items: game_data['items'],
-      effects: game_data['effects'],
-      explodeAnimation: {},
-      killedBy: nil,
-      team: team,
-      updatedAt: (Time.now.to_f * 1000).round
-    }
+    game_data['updatedAt'] = (Time.now.to_f * 1000).round
+    game_data['team'] = team
+    game_data
   end
 
   def self.get_players
@@ -43,8 +17,9 @@ class Player
   def self.add_player(game_data)
     players = get_players
     team = find_team(players, game_data['team'])
+    # remove player from explodedArray
     player = create_player(game_data, team)
-    players[player[:id]] = player
+    players[player['id']] = player
     REDIS.set('players', players.to_json)
     player
   end
@@ -57,6 +32,7 @@ class Player
   def self.remove_player(userId)
     players = Player.get_players
     players.delete(userId.to_s)
+    # add player to exploded array
     REDIS.set('players', players.to_json)
     {
       id: userId,
@@ -99,7 +75,7 @@ class Player
     end
 
     player['gameEvent'] = player_data['gameEvent']
-    player['consecutiveKills'] = player_data['consecutiveKills']
+    player['kills'] = player_data['kills']
     player['location'] = player_data['location']
     player['angle'] = player_data['angle']
     player['hitpoints'] = player_data['hitpoints']
