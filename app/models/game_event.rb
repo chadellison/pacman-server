@@ -10,21 +10,24 @@ class GameEvent
     when 'leak'
       player = AiPlayer.handle_leak(game_data)
     else
-      handle_ai_players(game_data['team'])
+      update_team_events(game_data['team'])
+      update_total_events
       player = Player.update_player(game_data)
     end
     GameEventBroadcastJob.perform_later(player)
   end
 
-  def self.handle_ai_players(team)
-    team_event_count = REDIS.get(team).to_i
+  def self.update_team_events(team)
+    team_event_count = REDIS.get(team + '_events').to_i
     team_event_count += 1
     if team_event_count > 0 && team_event_count % EVENT_DIVIDER == 0
-      bombers = AiPlayer.deploy_bombers(team == 'red' ? 'blue' : 'red', REDIS.get(team).to_i / EVENT_DIVIDER)
+      bombers = AiPlayer.deploy_bombers(team == 'red' ? 'blue' : 'red', team_event_count / EVENT_DIVIDER)
       GameEventBroadcastJob.perform_later(bombers)
     end
-    REDIS.set(team, team_event_count)
+    REDIS.set(team + '_events', team_event_count)
+  end
 
+  def self.update_total_events
     event_count = REDIS.get('event_count').to_i
     event_count += 1
     if event_count % EVENT_DIVIDER == 0
