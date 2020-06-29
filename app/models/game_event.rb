@@ -21,13 +21,13 @@ class GameEvent
   end
 
   def self.update_team_events(team)
-    team_event_count = REDIS.get(team + '_events').to_i
-    team_event_count += 1
-    if team_event_count > 0 && team_event_count % EVENT_DIVIDER == 0
-      bombers = AiPlayer.deploy_bombers(team == 'red' ? 'blue' : 'red', team_event_count / EVENT_DIVIDER)
+    last_send = REDIS.get(team + '_last_send').to_i
+    current_time = Time.now.to_i
+    if current_time - last_send > 60000
+      bombers = AiPlayer.deploy_bombers(team == 'red' ? 'blue' : 'red', rand(1..5))
       GameEventBroadcastJob.perform_later(bombers)
+      REDIS.set(team + '_last_send', current_time)
     end
-    REDIS.set(team + '_events', team_event_count)
   end
 
   def self.update_total_events

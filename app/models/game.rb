@@ -20,8 +20,8 @@ class Game
     REDIS.set('exploded_players', {}.to_json)
     REDIS.set('sequence', 0)
     REDIS.set('event_count', 0)
-    REDIS.set('red_events', 0)
-    REDIS.set('blue_events', 0)
+    REDIS.set('red_last_send', 0)
+    REDIS.set('blue_last_send', 0)
     REDIS.set('red_leaks', 0)
     REDIS.set('blue_leaks', 0)
     game_data
