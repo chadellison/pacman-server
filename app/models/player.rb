@@ -32,7 +32,7 @@ class Player
   def self.remove_player(userId)
     players = Player.get_players
     exploaded_player = players.delete(userId.to_s)
-    add_exploaded_player(exploaded_player) if exploaded_player['type'] == 'human'
+    add_exploaded_player(exploaded_player) if exploaded_player.present? && exploaded_player['type'] == 'human'
 
     REDIS.set('players', players.to_json)
     {

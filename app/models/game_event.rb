@@ -5,16 +5,19 @@ class GameEvent
     case game_data['gameEvent']
     when 'start'
       player = Player.add_player(game_data)
+      GameEventBroadcastJob.perform_later(player)
     when 'remove'
       player = Player.remove_player(game_data['id'])
+      GameEventBroadcastJob.perform_later(player)
     when 'leak'
       player = AiPlayer.handle_leak(game_data)
+      GameEventBroadcastJob.perform_later(player) if player.present?
     else
       update_team_events(game_data['team'])
       update_total_events
       player = Player.update_player(game_data)
+      GameEventBroadcastJob.perform_later(player)
     end
-    GameEventBroadcastJob.perform_later(player)
   end
 
   def self.update_team_events(team)

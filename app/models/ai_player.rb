@@ -33,7 +33,7 @@ class AiPlayer
       bomber = {
         id: id,
         type: 'bomber',
-        location: team == 'red' ? {x: 0, y: rand(300..900)} : {x: 1800, y: rand(300..900)},
+        location: team == 'red' ? {x: rand(0..100), y: rand(300..900)} : {x: rand(1700..1800), y: rand(300..900)},
         angle: team == 'red' ? 0 : 180,
         accelerate: true,
         velocity: rand(1..3),
@@ -70,10 +70,15 @@ class AiPlayer
 
     leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
     if leaks == 10
-      Game.handle_game_over(game_data)
+      winning_team = game_data['team'] == 'red' ? 'blue' : 'red'
+      Game.handle_game_over(game_data, winning_team)
     else
       REDIS.set(game_data['team'] + '_leaks', leaks)
       REDIS.set('players', players.to_json)
+      game_data['defenseData'] = {
+        red: 10 - REDIS.get('red_leaks').to_i,
+        blue: 10 - REDIS.get('blue_leaks').to_i
+      }
       game_data
     end
   end
