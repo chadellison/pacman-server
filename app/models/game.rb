@@ -24,6 +24,8 @@ class Game
     REDIS.set('blue_last_send', 0)
     REDIS.set('red_leaks', 0)
     REDIS.set('blue_leaks', 0)
+    REDIS.set('red_sends', 0)
+    REDIS.set('blue_sends', 0)
     game_data
   end
 end
