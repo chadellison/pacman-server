@@ -23,7 +23,8 @@ class GameEvent
   def self.update_team_events(team)
     last_send = REDIS.get(team + '_last_send').to_i
     current_time = Time.now.to_i
-    if current_time - last_send > 60000
+
+    if current_time - last_send > 60
       bombers = AiPlayer.deploy_bombers(team == 'red' ? 'blue' : 'red', rand(1..5))
       GameEventBroadcastJob.perform_later(bombers)
       REDIS.set(team + '_last_send', current_time)
