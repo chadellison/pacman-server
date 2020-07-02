@@ -1,7 +1,7 @@
 class AiPlayer
   def self.deploy_supply_ship
     players = Player.get_players
-    id = generate_sequence
+    id = Game.generate_sequence
     supply_ship = {
       id: id,
       type: 'supplyShip',
@@ -28,7 +28,7 @@ class AiPlayer
     bombers = []
 
     count.times do
-      id = generate_sequence
+      id = Game.generate_sequence
 
       bomber = {
         id: id,
@@ -55,13 +55,6 @@ class AiPlayer
 
     REDIS.set('players', players.to_json)
     { gameEvent: 'bombers', bombers: bombers }
-  end
-
-  def self.generate_sequence
-    sequence = REDIS.get('sequence').to_i
-    sequence += 1
-    REDIS.set('sequence', sequence)
-    sequence
   end
 
   def self.handle_leak(game_data)

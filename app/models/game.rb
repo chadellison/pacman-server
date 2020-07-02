@@ -5,6 +5,13 @@ class Game
     { red: 10 - red_leaks, blue: 10 - blue_leaks }
   end
 
+  def self.generate_sequence
+    sequence = REDIS.get('sequence').to_i
+    sequence += 1
+    REDIS.set('sequence', sequence)
+    sequence
+  end
+
   def self.handle_game_over(game_data, winning_team)
     players = Player.get_players.values.select { |player| player['type'] == 'human' }
     exploded_players = Player.get_exploaded_players.values
