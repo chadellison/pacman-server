@@ -14,17 +14,15 @@ class Game
 
   def self.handle_game_over(game_data, winning_team)
     players = Player.get_players.values.select { |player| player['type'] == 'human' }
-    exploded_players = Player.get_exploaded_players.values
     game_data = {
       gameEvent: 'gameOver',
       gameOverStats: {
-        playerStats: players + exploded_players,
+        playerStats: players,
         winningTeam: winning_team
       }
     }
 
     REDIS.set('players', {}.to_json)
-    REDIS.set('exploded_players', {}.to_json)
     REDIS.set('sequence', 0)
     REDIS.set('event_count', 0)
     REDIS.set('red_last_send', 0)
