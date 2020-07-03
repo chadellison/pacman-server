@@ -4,8 +4,7 @@ module Api
       def index
         render json: {
           players: Player.get_players.values,
-          defenseData: Game.find_defense_data,
-          userId: Game.generate_sequence
+          defenseData: Game.find_defense_data
         }
       end
     end
