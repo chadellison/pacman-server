@@ -1,5 +1,5 @@
 class GameEvent
-  EVENT_DIVIDER = 100
+  EVENT_DIVIDER = 200
 
   def self.handle_event(game_data)
     case game_data['gameEvent']
