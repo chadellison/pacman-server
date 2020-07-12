@@ -84,7 +84,7 @@ class AiPlayer
         blue: 10 - REDIS.get('blue_leaks').to_i
       }
       GameEventBroadcastJob.perform_later(game_data)
-      Game.handle_game_over if leaks == 10
+      REDIS.flushall if leaks == 10
     end
   end
 end

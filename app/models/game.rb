@@ -11,16 +11,4 @@ class Game
     REDIS.set('sequence', sequence)
     sequence
   end
-
-  def self.handle_game_over
-    REDIS.set('ai_ships', {}.to_json)
-    REDIS.set('sequence', 0)
-    REDIS.set('event_count', 0)
-    REDIS.set('red_last_send', 0)
-    REDIS.set('blue_last_send', 0)
-    REDIS.set('red_leaks', 0)
-    REDIS.set('blue_leaks', 0)
-    REDIS.set('red_sends', 0)
-    REDIS.set('blue_sends', 0)
-  end
 end
