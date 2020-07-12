@@ -4,8 +4,7 @@ class GameDataChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    player_data = Player.remove_player(params['userId'])
-    GameEventBroadcastJob.perform_later(player_data)
+    Player.unsubscribe_player(params['userId'])
   end
 
   def create(opts)

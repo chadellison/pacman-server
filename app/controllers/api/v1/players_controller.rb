@@ -3,7 +3,8 @@ module Api
     class PlayersController < ApplicationController
       def index
         render json: {
-          players: Player.get_players.values,
+          players: Player.get_players,
+          aiShips: AiPlayer.get_ai_ships.values,
           defenseData: Game.find_defense_data
         }
       end

@@ -12,17 +12,8 @@ class Game
     sequence
   end
 
-  def self.handle_game_over(game_data, winning_team)
-    players = Player.get_players.values.select { |player| player['type'] == 'human' }
-    game_data = {
-      gameEvent: 'gameOver',
-      gameOverStats: {
-        playerStats: players,
-        winningTeam: winning_team
-      }
-    }
-
-    REDIS.set('players', {}.to_json)
+  def self.handle_game_over
+    REDIS.set('ai_ships', {}.to_json)
     REDIS.set('sequence', 0)
     REDIS.set('event_count', 0)
     REDIS.set('red_last_send', 0)
@@ -31,6 +22,5 @@ class Game
     REDIS.set('blue_leaks', 0)
     REDIS.set('red_sends', 0)
     REDIS.set('blue_sends', 0)
-    game_data
   end
 end
