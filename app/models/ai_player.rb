@@ -74,16 +74,17 @@ class AiPlayer
 
   def self.handle_leak(game_data)
     ai_ships = get_ai_ships
-    ai_ships.delete(game_data['id'].to_s)
-
-    leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
-    REDIS.set(game_data['team'] + '_leaks', leaks)
-    REDIS.set('ai_ships', ai_ships.to_json)
-    game_data['defenseData'] = {
-      red: 10 - REDIS.get('red_leaks').to_i,
-      blue: 10 - REDIS.get('blue_leaks').to_i
-    }
-    GameEventBroadcastJob.perform_later(game_data)
-    Game.handle_game_over if leaks == 10
+    leak = ai_ships.delete(game_data['id'].to_s)
+    if leak.present?
+      leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
+      REDIS.set(game_data['team'] + '_leaks', leaks)
+      REDIS.set('ai_ships', ai_ships.to_json)
+      game_data['defenseData'] = {
+        red: 10 - REDIS.get('red_leaks').to_i,
+        blue: 10 - REDIS.get('blue_leaks').to_i
+      }
+      GameEventBroadcastJob.perform_later(game_data)
+      Game.handle_game_over if leaks == 10
+    end
   end
 end
