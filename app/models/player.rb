@@ -66,8 +66,6 @@ class Player
         player['velocity'] = player_data['velocity']
         player['shipIndex'] = player_data['shipIndex']
         player['maxHitpoints'] = player_data['maxHitpoints']
-      when 'buff'
-        player['buffIndex'] = player_data['buffIndex']
       end
 
       player['gameEvent'] = player_data['gameEvent']

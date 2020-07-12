@@ -1,5 +1,6 @@
 class GameEvent
   EVENT_DIVIDER = 200
+  RANDOM_BUFF_INDEX_SIZE = 8
 
   def self.handle_event(game_data)
     case game_data['gameEvent']
@@ -52,7 +53,10 @@ class GameEvent
     else
       ai_ships = AiPlayer.get_ai_ships
       ai_ships.delete(game_data['id'].to_s)
+      game_data['buffIndex'] = rand(RANDOM_BUFF_INDEX_SIZE) if game_data['type'] == 'supplyShip'
+      game_data['updatedAt'] = (Time.now.to_f * 1000).round
       REDIS.set('ai_ships', ai_ships.to_json)
+      GameEventBroadcastJob.perform_later(game_data)
     end
   end
 end
