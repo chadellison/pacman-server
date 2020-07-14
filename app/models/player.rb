@@ -9,7 +9,6 @@ class Player
         REDIS.flushall
       else
         player['explode'] = true
-        player['active'] = false
         player['gameEvent'] = 'explode'
         player['explodeAnimation'] = {x: 0, y: 0};
         player['updatedAt'] = (Time.now.to_f * 1000).round

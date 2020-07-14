@@ -46,8 +46,9 @@ class GameEvent
   def self.handle_explode_event(game_data)
     if game_data['type'] === 'human'
       game_data['updatedAt'] = (Time.now.to_f * 1000).round
+      game_data['explodedAt'] = (Time.now.to_f * 1000).round
       players = Player.get_players
-      players[player['index']] = player
+      players[game_data['index']] = game_data
       REDIS.set('players', players.to_json)
       GameEventBroadcastJob.perform_later(game_data)
     else
