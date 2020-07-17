@@ -8,7 +8,6 @@ class Player
       if players.all? { |p| p['unsubscribed'] }
         REDIS.flushall
       else
-        player['explode'] = true
         player['active'] = false
         player['gameEvent'] = 'explode'
         player['explodeAnimation'] = {coordinates: {x: 0, y: 0}};
