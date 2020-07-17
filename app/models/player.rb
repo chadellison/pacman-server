@@ -11,8 +11,9 @@ class Player
         player['explode'] = true
         player['active'] = false
         player['gameEvent'] = 'explode'
-        player['explodeAnimation'] = {x: 0, y: 0};
+        player['explodeAnimation'] = {coordinates: {x: 0, y: 0}};
         player['updatedAt'] = (Time.now.to_f * 1000).round
+        player['explodedAt'] = (Time.now.to_f * 1000).round
         player['effects'] = {}
         players[player['index']] = player
 
