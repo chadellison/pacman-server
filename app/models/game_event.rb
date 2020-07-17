@@ -6,8 +6,6 @@ class GameEvent
     case game_data['gameEvent']
     when 'start'
       player = Player.activate_player(game_data)
-      player['eventId'] = game_data['eventId']
-      player['serverTime'] = game_data['serverTime']
       GameEventBroadcastJob.perform_later(player)
     when 'explode'
       handle_explode_event(game_data)
@@ -17,8 +15,6 @@ class GameEvent
       update_team_events(game_data['team'])
       update_total_events
       player = Player.update_player(game_data)
-      player['eventId'] = game_data['eventId']
-      player['serverTime'] = game_data['serverTime']
       GameEventBroadcastJob.perform_later(player)
     end
   end
