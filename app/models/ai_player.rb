@@ -33,15 +33,12 @@ class AiPlayer
     end
   end
 
-  def self.deploy_bombers(team, count)
+  def self.deploy_bombers(game_data)
     ai_ships = get_ai_ships
     bombers = []
-    count_offset = count - 5
 
-    ship_count = count_offset > 0 ? 5 : count
-    hitpoints = count_offset > 0 ? 100 * count_offset : 100
-
-    ship_count.times do
+    team = game_data['team']
+    game_data['shipCount'].times do
       id = Game.generate_sequence
 
       bomber = {
@@ -57,8 +54,8 @@ class AiPlayer
         armor: 1,
         trajectory: team == 'red' ? 0 : 180,
         rotate: 'none',
-        hitpoints: hitpoints,
-        maxHitpoints: hitpoints,
+        hitpoints: game_data['shipHitpoints'],
+        maxHitpoints: game_data['shipHitpoints'],
         gameEvent: 'bombers',
         team: team,
         explodeAnimation: {},
