@@ -28,9 +28,11 @@ class GameEvent
       game_data['updatedAt'] = (Time.now.to_f * 1000).round
       game_data['explodedAt'] = (Time.now.to_f * 1000).round
       players = Player.get_players
-      players[game_data['index']] = game_data
-      REDIS.set('players', players.to_json)
-      GameEventBroadcastJob.perform_later(game_data)
+      if players[game_data['index']].present?
+        players[game_data['index']] = game_data
+        REDIS.set('players', players.to_json)
+        GameEventBroadcastJob.perform_later(game_data)
+      end
     else
       ai_ships = AiPlayer.get_ai_ships
       ai_ships.delete(game_data['id'].to_s)
