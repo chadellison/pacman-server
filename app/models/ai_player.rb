@@ -37,30 +37,13 @@ class AiPlayer
     ai_ships = get_ai_ships
     bombers = []
 
-    team = game_data['team']
-    game_data['shipCount'].times do
+    game_data['bombers'].each do |bomber|
       id = Game.generate_sequence
-
-      bomber = {
-        id: id,
-        type: 'bomber',
-        active: true,
-        location: team == 'red' ? {x: rand(0..100), y: rand(300..900)} : {x: rand(1700..1800), y: rand(300..900)},
-        angle: team == 'red' ? 0 : 180,
-        accelerate: true,
-        velocity: rand(1..3),
-        effects: {},
-        score: 0,
-        armor: 1,
-        trajectory: team == 'red' ? 0 : 180,
-        rotate: 'none',
-        hitpoints: game_data['shipHitpoints'],
-        maxHitpoints: game_data['shipHitpoints'],
-        gameEvent: 'bombers',
-        team: team,
-        explodeAnimation: {},
-        updatedAt: (Time.now.to_f * 1000).round
-      }
+      bomber[:id] = id
+      bomber[:location] = bomber['team'] == 'red' ? {x: rand(0..100), y: rand(300..900)} : {x: rand(1700..1800), y: rand(300..900)}
+      bomber[:angle] = bomber['team'] == 'red' ? 0 : 180
+      bomber[:trajectory] = bomber['team'] == 'red' ? 0 : 180
+      bomber[:updatedAt] = (Time.now.to_f * 1000).round
       bombers << bomber
       ai_ships[id] = bomber
     end
