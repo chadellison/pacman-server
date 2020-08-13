@@ -5,6 +5,7 @@ class AiPlayer
     supply_ship = {
       id: id,
       type: 'supplyShip',
+      name: 'supply ship',
       location: {x: 1800, y: 1125},
       angle: 1,
       active: true,
