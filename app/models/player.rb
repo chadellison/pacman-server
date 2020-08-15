@@ -42,7 +42,8 @@ class Player
 
     def update_player(player_data)
       players = Player.get_players
-      if players[player_data['index'].to_i].present?
+      player = players[player_data['index'].to_i]
+      if player.present? && player['active']
         player_data['updatedAt'] = (Time.now.to_f * 1000).round
         players[player_data['index'].to_i] = player_data
         REDIS.set('players', players.to_json)
