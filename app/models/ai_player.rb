@@ -10,6 +10,7 @@ class AiPlayer
       angle: 1,
       active: true,
       effects: {},
+      items: {},
       score: 0,
       armor: rand(6),
       trajectory: rand(360),
