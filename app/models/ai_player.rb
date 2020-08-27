@@ -1,6 +1,14 @@
 class AiPlayer
+  def self.generate_sequece
+    sequence = REDIS.get('sequence').to_i
+    sequence += 1
+    REDIS.set('sequence', sequence)
+    sequence
+  end
+
   def self.deploy_supply_ship
     {
+      id: generate_sequece,
       type: 'supplyShip',
       name: 'supply ship',
       location: {x: 1800, y: 1125},
