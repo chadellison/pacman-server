@@ -31,8 +31,6 @@ class AiPlayer
   def self.deploy_bombers(game_data)
     bombers = game_data['bombers'].map do |bomber|
       bomber[:location] = bomber['team'] == 'red' ? {x: rand(0..100), y: rand(300..900)} : {x: rand(1700..1800), y: rand(300..900)}
-      bomber[:angle] = bomber['team'] == 'red' ? 0 : 180
-      bomber[:trajectory] = bomber['team'] == 'red' ? 0 : 180
       bomber[:updatedAt] = (Time.now.to_f * 1000).round
       bomber
     end
