@@ -30,6 +30,7 @@ class AiPlayer
 
   def self.deploy_bombers(game_data)
     bombers = game_data['bombers'].map do |bomber|
+      bomber[:id] = generate_sequece
       bomber[:location] = bomber['team'] == 'red' ? {x: rand(0..100), y: rand(300..900)} : {x: rand(1700..1800), y: rand(300..900)}
       bomber[:updatedAt] = (Time.now.to_f * 1000).round
       bomber
@@ -39,16 +40,20 @@ class AiPlayer
   end
 
   def self.handle_leak(game_data)
-    leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
-    REDIS.set(game_data['team'] + '_leaks', leaks)
-    game_data['defenseData'] = {
-      red: 10 - REDIS.get('red_leaks').to_i,
-      blue: 10 - REDIS.get('blue_leaks').to_i
-    }
-    GameEventBroadcastJob.perform_later(game_data)
-    if leaks == 10
-      Score.add_scores
-      REDIS.flushall
+    leak = REDIS.get(game_data['id'])
+    if leak.blank?
+      leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
+      REDIS.set(game_data['team'] + '_leaks', leaks)
+      game_data['defenseData'] = {
+        red: 10 - REDIS.get('red_leaks').to_i,
+        blue: 10 - REDIS.get('blue_leaks').to_i
+      }
+      REDIS.set(game_data['id'], true)
+      GameEventBroadcastJob.perform_later(game_data)
+      if leaks == 10
+        Score.add_scores
+        REDIS.flushall
+      end
     end
   end
 end
