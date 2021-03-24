@@ -45,12 +45,12 @@ class AiPlayer
       leaks = REDIS.get(game_data['team'] + '_leaks').to_i + 1
       REDIS.set(game_data['team'] + '_leaks', leaks)
       game_data['defenseData'] = {
-        red: 10 - REDIS.get('red_leaks').to_i,
-        blue: 10 - REDIS.get('blue_leaks').to_i
+        red: 100 - REDIS.get('red_leaks').to_i,
+        blue: 100 - REDIS.get('blue_leaks').to_i
       }
       REDIS.set(game_data['id'], true)
       GameEventBroadcastJob.perform_later(game_data)
-      if leaks == 10
+      if leaks == 100
         Score.add_scores
         REDIS.flushall
       end
