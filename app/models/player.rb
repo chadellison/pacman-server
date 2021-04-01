@@ -31,6 +31,7 @@ class Player
     end
 
     def activate_player(game_data)
+      REDIS.hdel('exploded', game_data['index'])
       players = get_players
       game_data['updatedAt'] = (Time.now.to_f * 1000).round
       game_data['index'] = players.size if game_data['index'].blank?
@@ -43,11 +44,17 @@ class Player
     def update_player(player_data)
       players = Player.get_players
       player = players[player_data['index'].to_i]
-      if player.present? && player['active']
-        player_data['updatedAt'] = (Time.now.to_f * 1000).round
-        players[player_data['index'].to_i] = player_data
-        REDIS.set('players', players.to_json)
-        player_data
+
+      if player.present?
+        if REDIS.hget('exploded', player['index']).present?
+          player_data['gameEvent'] = 'explode'
+          GameEventBroadcastJob.perform_later(player_data)
+        else
+          player_data['updatedAt'] = (Time.now.to_f * 1000).round
+          players[player_data['index'].to_i] = player_data
+          REDIS.set('players', players.to_json)
+          player_data
+        end
       end
     end
   end
